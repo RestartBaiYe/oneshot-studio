@@ -19,7 +19,7 @@
   function checklist(res){var body=q('#deliveryChecklist');body.replaceChildren();[['规则初筛',res&&res.verdict&&res.verdict.pass],['人工批准',res&&res.deliveryApproved],['本地文件可导出',res&&res.deliveryApproved&&!!res.files]].forEach(function(row){body.appendChild(node('div','delivery-check '+(row[1]?'complete':''),(row[1]?'✓ ':'○ ')+row[0]));});}
   checklist(null);
   function save(){if(running)return;try{localStorage.setItem('oneshot.task-draft',JSON.stringify({brief:q('#brief').value,platform:q('#platform').value}));draft.textContent='草稿已保存到本机 · '+new Date().toLocaleTimeString();}catch(e){draft.textContent='浏览器不允许保存草稿，本次输入仍可使用。';}}
-  try{var saved=JSON.parse(localStorage.getItem('oneshot.task-draft')||'null');if(saved&&typeof saved.brief==='string'&&PLAT[saved.platform]){q('#brief').value=saved.brief;q('#platform').value=saved.platform;draft.textContent='已恢复上次商品草稿 · 运行结果需重新生成';}}catch(e){draft.textContent='草稿不可读取，请直接输入商品信息。';}
+  try{var saved=JSON.parse(localStorage.getItem('oneshot.task-draft')||'null');if(!window.ONESHOT_DEMO&&saved&&typeof saved.brief==='string'&&PLAT[saved.platform]){q('#brief').value=saved.brief;q('#platform').value=saved.platform;draft.textContent='已恢复上次商品草稿 · 运行结果需重新生成';}}catch(e){draft.textContent='草稿不可读取，请直接输入商品信息。';}
   function changed(){if(running)return;evidence.disabled=true;save();checklist(null);q('#executionPlan').replaceChildren(node('p','hint','输入已变化，等待重新规划。'));q('#revisionHistory').replaceChildren(node('p','hint','输入已变化，旧版本不用于本次交付。'));}
   q('#brief').addEventListener('input',changed);q('#platform').addEventListener('change',changed);q('#btnClear').addEventListener('click',changed);q('#chips').addEventListener('click',changed);
   function renderPlan(){var body=q('#executionPlan');body.replaceChildren();plan.forEach(function(step,i){var row=node('div','plan-item '+(i===current?'active':i<current?'complete':''));row.appendChild(node('span','plan-number',String(i+1).padStart(2,'0')));var info=node('div');info.appendChild(node('b','',Tools.get(step.tool).title));info.appendChild(node('small','',step.why||step.tool));row.appendChild(info);body.appendChild(row);});}
@@ -32,6 +32,14 @@
     if(kind==='done'){running=false;evidence.disabled=false;checklist(p);if(p.status==='delivered'){current=plan.length;renderPlan();}q('#executionPlan').appendChild(node('p','hint',p.error||'本次结束 · '+p.status+' · '+p.steps.length+' 次工具调用'));}
     return original.call(this,kind,p);
   };
+  if(window.ONESHOT_DEMO){
+    var welcome=node('section','card demo-welcome');welcome.innerHTML='<div><span class="eyebrow">免配置 · 离线交互演示</span><h3>选一个场景，立即开始。</h3><p>本地规则实时执行，无需账号或密钥。审阅结果后点击批准，即可下载文件。</p><p>这是离线工作流演示，不调用大模型；修订场景会明确注入一条不支持的参数。</p></div><div class="rowbtns"><button id="demoQuick" class="btn">一键体验完整流程 →</button><button id="demoRepair" class="btn ghost">演示错误拦截与修订</button></div>';
+    q('.workspace-intro').after(welcome);
+    function startDemo(repair){if(Agent.state.running)return;q('#brief').value=BRIEFS[0].b;q('#platform').value='douyin';q('#bait').checked=repair;q('#brief').dispatchEvent(new Event('input',{bubbles:true}));LLM.active='offline';q('#railProviderTxt').textContent='离线交互演示 · 无模型调用';q('#btnStart2').click();}
+    q('#demoQuick').onclick=function(){startDemo(false);};q('#demoRepair').onclick=function(){startDemo(true);};
+    q('#nextAction').textContent='直接点击「一键体验完整流程」，或选择「演示错误拦截与修订」。无需配置。';
+    q('#railProviderTxt').textContent='离线交互演示 · 无模型调用';
+  }
   var media=matchMedia('(prefers-reduced-motion: reduce)');
   if(!media.matches&&Element.prototype.animate){document.querySelectorAll('.workspace-intro,.flow,.desk>.col,.script-card').forEach(function(el,i){el.animate([{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],{duration:400,delay:i*65,easing:'ease-out'});});}
   document.querySelectorAll('.card').forEach(function(card){card.addEventListener('pointermove',function(e){if(media.matches||e.pointerType==='touch')return;var rect=card.getBoundingClientRect();card.style.setProperty('--spot-x',(e.clientX-rect.left)+'px');card.style.setProperty('--spot-y',(e.clientY-rect.top)+'px');});});

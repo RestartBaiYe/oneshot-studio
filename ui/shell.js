@@ -366,7 +366,8 @@
   $("#btnStart").onclick = run;
   $("#btnStart2").onclick = run;
   document.addEventListener("keydown", function (e) { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); run(); } });
-  LLM.load();
+  window.ONESHOT_DEMO = location.hostname === "restartbaiye.github.io" || new URLSearchParams(location.search).get("demo") === "1";
+  if (window.ONESHOT_DEMO) { LLM.active="offline"; LLM.cfg.base=""; LLM.cfg.key=""; } else LLM.load();
   renderRegistry(); renderCfg(); renderMem(); renderTrace();
 
   /* 事实表与合规面板：从最近一次 observe 里取 */
