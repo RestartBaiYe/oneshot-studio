@@ -1,0 +1,139 @@
+/* OneShot Agent Runtime · 工具层
+   每个工具 = { id, title, scope, schema, run(args, ctx) -> observation }
+   工具是 Agent 唯一能改变世界的接口；scope 决定是否需要人工审批。 */
+(function (root) {
+  var T = [];
+
+  function def(id, title, scope, schema, run) { T.push({ id: id, title: title, scope: scope, schema: schema, run: run }); }
+  function get(id) { for (var i = 0; i < T.length; i++) if (T[i].id === id) return T[i]; return null; }
+  function list() { return T.map(function (t) { return { id: t.id, title: t.title, scope: t.scope, schema: t.schema }; }); }
+
+  function need(v, name) { if (v === undefined || v === null || v === "") throw new Error("缺少参数 " + name); return v; }
+
+  def("brief.parse", "解析商品 brief", "read",
+    "{ brief: string }", function (a) {
+      var b = String(need(a.brief, "brief"));
+      var p = root.parseBrief(b);
+      return { name: p.name, audience: p.audience, price: p.price, selling: p.claims,
+               chars: b.length, masked: b.slice(0, 40) + (b.length > 40 ? "…" : "") };
+    });
+
+  def("facts.extract", "抽取事实表（价格/参数/材质）", "read",
+    "{ brief: string }", function (a) {
+      var rows = root.extractFacts(String(need(a.brief, "brief")));
+      return { count: rows.length, rows: rows.map(function (r) { return { k: r.k, v: r.v, src: r.src }; }) };
+    });
+
+  def("compliance.scan", "广告法违禁词扫描", "read",
+    "{ text: string }", function (a) {
+      var t = String(need(a.text, "text")), hits = [];
+      root.BANNED.forEach(function (b) {
+        var m = t.match(new RegExp(b[1].source, "g"));
+        if (m) hits.push({ kind: b[0], words: m });
+      });
+      return { hits: hits, clean: hits.length === 0 };
+    });
+
+  def("script.draft", "按平台规范起草 4 句分镜文案", "read",
+    "{ brief: string, platform: string, bait?: bool }", async function (a, ctx) {
+      var brief = String(need(a.brief, "brief")), plat = root.PLAT[need(a.platform, "platform")];
+      var p = root.parseBrief(brief), rnd = root.mulberry32(root.hash(brief + a.platform));
+      var s = root.makeScript(p, plat, rnd);
+      if(root.LLM.active !== "offline") {
+        var r=await root.LLM.chat([{role:"system",content:root.Agent.systemPrompt()},{role:"user",content:"商品 brief："+brief+"；平台字幕上限："+plat.sub+"字；钩子上限："+plat.hook+"字。历史退回参考（不是商品事实）："+JSON.stringify(ctx.memory||{})+"。输出 {lines:{hook,claim,proof,cta}}，只引用原文卖点，不添加实测或价格对比。"}],{json:true,temp:0.3});
+        if(r.offline)throw new Error("模型起草失败："+r.error);
+        s=JSON.parse(r.text).lines; validateLines(s);
+      }
+      if (a.bait) {
+        var cand = [String(s.claim), String(s.proof)], applied = false;
+        for (var bi = 0; bi < cand.length && !applied; bi++) {
+          if (/\d+(?:\.\d+)?\s*小时/.test(cand[bi])) {
+            cand[bi] = cand[bi].replace(/\d+(?:\.\d+)?(\s*小时)/, "24$1");
+            if (bi === 0) s.claim = cand[bi]; else s.proof = cand[bi];
+            applied = true;
+          }
+        }
+        if (!applied) s.proof = "实测 24 小时";
+        if (String(s.proof).length > plat.sub) {
+          var cl = String(s.proof).split("，"), pick = "";
+          for (var ci = 0; ci < cl.length; ci++) { if (cl[ci].length <= plat.sub) { pick = cl[ci]; break; } }
+          s.proof = pick || String(s.proof).slice(0, plat.sub - 1) + "…";
+        }
+      }
+      var L = { hook: s.hook, claim: s.claim, proof: s.proof, cta: s.cta };
+      return { hook: s.hook, claim: s.claim, proof: s.proof, cta: s.cta, lines: L,
+               limits: { hook: plat.hook, sub: plat.sub, name: plat.name } };
+    });
+
+  def("subtitle.fit", "字幕压行（按平台单行上限）", "write",
+    "{ lines: object, platform: string }", function (a) {
+      var plat = root.PLAT[need(a.platform, "platform")], L = need(a.lines, "lines"), fixed = [], before = {};
+      ["hook", "claim", "proof", "cta"].forEach(function (k) {
+        before[k] = L[k];
+        var max = (k === "hook") ? plat.hook : plat.sub;
+        if (L[k] && L[k].length > max) { fixed.push({ k: k, from: L[k].length, to: max }); L[k] = root.clampSub(L[k], max); }
+      });
+      return { lines: L, truncated: fixed, limit: { hook: plat.hook, sub: plat.sub } };
+    });
+
+  def("review.judge", "规则审片：8 项检查与修改依据", "read",
+    "{ lines: object, brief: string, platform: string }", function (a) {
+      var brief = String(need(a.brief, "brief")), plat = root.PLAT[need(a.platform, "platform")];
+      var L = need(a.lines, "lines"), p = root.parseBrief(brief), facts = root.extractFacts(brief);
+      var subs = [L.hook, L.claim, L.proof, L.cta];
+      var issues = root.review(subs, p, brief, facts, plat);
+      var bad = issues.filter(function (i) { return !i.ok; });
+      return { checks: issues.map(function (i) { return { name: i.name, ok: i.ok, detail: i.detail, fix: i.fix }; }),
+               fails: bad.map(function (i) { return i.name; }), pass: bad.length === 0, subs: subs };
+    });
+
+  def("stage.preview", "写入成片舞台并渲染首帧", "write",
+    "{ lines: object, brief: string, platform: string }", function (a) {
+      var brief = String(need(a.brief, "brief")), plat = root.PLAT[need(a.platform, "platform")];
+      var L = a.lines, p = root.parseBrief(brief);
+      root.STORY = { p: p, subs: [L.hook, L.claim, L.proof, L.cta], plat: plat };
+      root.drawAt(0.6);
+      return { duration: 15, scenes: 4, size: "1080x1920", safeArea: "字幕基线 y=1746" };
+    });
+
+  def("deliver.export", "生成交付包（文案 / SRT / 分镜 CSV / 审片报告）", "publish",
+    "{ brief: string, lines: object, platform: string, round: number }", function (a, ctx) {
+      if(!ctx.deliveryApproved || !ctx.verdict.pass)throw new Error("交付尚未批准");
+      ctx.files=buildFiles(ctx);
+      return {files:Object.keys(ctx.files),bytes:new TextEncoder().encode(JSON.stringify(ctx.files)).length,gate:"本次任务已批准，可下载"};
+    });
+
+  def("memory.recall", "检索历史执行记忆（同类 brief 的退回原因）", "read",
+    "{ brief: string }", function (a) {
+      var key = String(a.brief || "").slice(0, 6), all = root.memLoad ? root.memLoad() : [];
+      var hit = all.filter(function (r) { return (r.name || "").indexOf(key) >= 0 || key.indexOf(String(r.name || "").slice(0, 3)) >= 0; });
+      var recent = all.slice(-5);
+      return { total: all.length, hit: hit.length, recent: recent.map(function (r) { return { name: r.name, first: r.first }; }) };
+    });
+
+  def("memory.write", "把本次执行写入记忆", "write",
+    "{ brief: string, passed: number, total: number, rounds: number, first: array }", function (a) {
+      if (root.memAdd) root.memAdd({ t: Date.now(), name: root.parseBrief(String(a.brief)).name, plat: "agent",
+        passed: a.passed, total: a.total, rounds: a.rounds, first: a.first || [] });
+      return { written: true };
+    });
+
+  function validateLines(lines){
+    if(!lines||typeof lines!=="object"||Array.isArray(lines))throw new Error("文案必须是四字段对象");
+    ["hook","claim","proof","cta"].forEach(function(k){if(typeof lines[k]!=="string"||!lines[k].trim()||lines[k].length>1000)throw new Error("文案字段无效："+k);});
+  }
+  function validate(id,a){
+    if(!get(id))throw new Error("未知工具");
+    if(typeof a.brief!=="string"||!a.brief.trim())throw new Error("brief 无效");
+    if(!root.PLAT[a.platform])throw new Error("未知平台");
+    if(["subtitle.fit","review.judge","stage.preview","deliver.export","script.revise"].indexOf(id)>=0)validateLines(a.lines);
+  }
+  function buildFiles(ctx){
+    var subs=ctx.verdict.subs,plat=root.PLAT[ctx.platform],acc=0;
+    function stamp(t){return "00:"+String(Math.floor(t/60)).padStart(2,"0")+":"+String(Math.floor(t%60)).padStart(2,"0")+",000";}
+    var srt=subs.map(function(s,i){var start=acc;acc+=plat.dur[i];return (i+1)+"\n"+stamp(start)+" --> "+stamp(acc)+"\n"+s+"\n";}).join("\n");
+    function cell(s){s=String(s);if(/^[=+@-]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
+    return {txt:"商品 brief："+ctx.brief+"\n\n"+subs.join("\n"),srt:srt,csv:"序号,时长,字幕\n"+subs.map(function(s,i){return [i+1,plat.dur[i],cell(s)].join(",");}).join("\n"),md:"# 规则审片报告\n\n平台："+plat.name+"；轮次："+ctx.round+"。仅规则初筛，需人工复核。\n\n"+ctx.verdict.checks.map(function(c){return "- "+c.name+"："+(c.ok?"通过":"未过")+"；"+c.detail;}).join("\n")};
+  }
+  root.Tools = { all:T,get:get,list:list,validate:validate,validateLines:validateLines,buildFiles:buildFiles };
+})(window);

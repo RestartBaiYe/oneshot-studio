@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OneShot Studio · 电商内容运营 Agent</title>
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/studio.css">
+</head>
+<body>
+<div id="app">
+  <aside class="rail">
+    <div class="brand"><div class="mark"></div><div><b>OneShot</b><span>STUDIO · AGENT</span></div></div>
+    <nav class="nav" id="nav">
+      <button data-pane="desk" class="on"><span class="ic">▤</span>作业台</button>
+      <button data-pane="review"><span class="ic">✓</span>审片台<span class="badge" id="navReview">—</span></button>
+      <button data-pane="batch"><span class="ic">≡</span>清单批处理</button>
+      <button data-pane="memory"><span class="ic">◈</span>记忆库<span class="badge" id="navMem">0</span></button>
+      <button data-pane="trace"><span class="ic">⇄</span>执行轨迹</button>
+      <button data-pane="settings"><span class="ic">⚙</span>运行设置</button>
+    </nav>
+    <div class="sp"></div>
+    <div class="railfoot">
+      <span class="pill" id="railProvider"><span class="dot"></span><span id="railProviderTxt">离线确定性策略</span></span>
+      <span>v1.1 · 受约束的内容工作流</span>
+      <a href="README.md" style="color:#9C9287;font-size:11px;text-decoration:none">使用说明 →</a>
+    </div>
+  </aside>
+
+  <div class="stagewrap">
+    <header class="topbar">
+      <h1>OneShot Studio<small>电商内容运营 · 投前审片与交付</small></h1>
+      <div class="meters">
+        <span>步数 <b id="mSteps">0</b></span>
+        <span>耗时 <b id="mMs">0</b> ms</span>
+        <span>调用成本 <b id="mCost">离线 · 无 API 调用</b></span>
+      </div>
+      <span class="status" id="status"><span class="d"></span><span id="statusTxt">待命</span></span>
+      <button class="btn ghost sm" id="btnStop">停止</button>
+      <button class="btn copper" id="btnStart">开始生成 ⌘↵</button>
+    </header>
+
+    <main>
+      <!-- 作业台 -->
+      <section class="pane on" id="pane-desk">
+        <div class="workspace-intro"><div><span class="eyebrow">FROM BRIEF TO DELIVERY</span><h2>让每一句卖点，都有据可查。</h2><p>输入商品信息，生成 15 秒脚本；审片通过后，由你决定交付。</p></div><button class="btn ghost" id="showcase">演示视图</button></div>
+<div class="flow" aria-label="任务流程"><span data-phase="0" class="active">01 商品输入</span><span data-phase="1">02 脚本生成</span><span data-phase="2">03 规则审片</span><span data-phase="3">04 批准交付</span></div><p id="nextAction" role="status" aria-live="polite">下一步：选择示例或填写商品信息，点击「运行 Agent」。当前模式见左下角。</p><div class="desk">
+          <div class="col scroll">
+            <div class="card">
+              <h3>01 · 商品与任务<span class="n" id="taskId">NEW</span></h3>
+              <label class="f">商品 brief（Agent 的唯一事实来源）</label>
+              <textarea id="brief">保温杯 316L 不锈钢，容量 500ml，12 小时保温，一键开盖单手可开，食品级硅胶圈。售价 79 元，主打通勤上班族和学生党，今天下单送杯刷。</textarea>
+              <div class="chips" id="chips"></div>
+              <label class="f">投放平台（决定字幕字数上限）</label>
+              <select id="platform">
+                <option value="douyin">抖音 · 单行 14 字 / 钩子 12 字</option>
+                <option value="shipinhao">视频号 · 单行 16 字 / 钩子 14 字</option>
+                <option value="xiaohongshu">小红书 · 单行 12 字 / 钩子 10 字</option>
+              </select>
+              <details class="test-options"><summary>故障演示选项</summary><label class="f" style="display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer">
+                <input type="checkbox" id="bait" style="width:auto;margin:0">
+                <span style="font-size:12px;color:var(--ink2)">注入一次幻觉（"实测 24 小时"），演示事实守卫如何打回</span>
+              </label></details>
+              <div class="rowbtns"><button class="btn" id="btnStart2">运行 Agent</button><button class="btn ghost" id="btnClear">清空轨迹</button></div>
+              <p class="hint">成功标准：8 项规则初筛通过、字幕不折行、数字在 brief 命中（不等于完整语义核验）、单条审片 ≤3 轮。</p>
+            </div>
+            <details class="card technical"><summary>工具与执行契约</summary>
+              <h3>工具注册表<span class="n" id="toolN">0</span></h3>
+              <div id="toolList"></div>
+            </details>
+            <details class="card technical"><summary>守卫与预算</summary>
+              <div class="kv"><span>最大步数</span><b id="gSteps">40</b></div>
+              <div class="kv"><span>单次预算</span><b id="gMs">60 s</b></div>
+              <div class="kv"><span>最多审片轮数</span><b id="gRepair">3 轮</b></div>
+              <div class="kv"><span>发布类工具</span><b>需人工审批</b></div>
+            </details>
+          </div>
+
+          <div class="stagecol"><div class="card script-card"><h3>02 · 分镜脚本 <span class="n">15 秒 / 4 个镜头</span></h3><div id="scriptOutput" aria-live="polite"><div class="script-empty"><span>你的下一条内容，从这里开始</span><p>运行后展示钩子、卖点、证据与行动引导。每行文字可直接审阅。</p></div></div><button class="btn ghost sm" id="openReview">查看完整审片 →</button></div><details class="preview-details"><summary>代码分镜预览 · 非 AI 生成视频</summary>
+            <div class="stage">
+              <div class="phone"><canvas id="cv" width="1080" height="1920"></canvas></div>
+              <div class="transport">
+                <button id="btnPlayIcon">▶</button>
+                <div class="bar"><i id="prog"></i></div>
+                <span id="tc">00:00 / 00:15</span>
+                <button id="btnShot" title="存封面">▣</button>
+              </div>
+            </div>
+            </details><div class="card delivery-card" style="flex:0 0 auto">
+              <h3>04 · 交付文件</h3>
+              <div class="meta" id="artMeta"><span>尚未运行</span></div>
+              <div class="rowbtns" id="exports">
+                <button class="btn ghost sm" id="expTxt">文案 txt</button>
+                <button class="btn ghost sm" id="expSrt">字幕 srt</button>
+                <button class="btn ghost sm" id="expCsv">分镜 csv</button>
+                <button class="btn ghost sm" id="expMd">审片报告</button>
+              </div>
+              <p class="hint" id="gateNote">交付闸门：审片未通过时导出按钮锁定。</p>
+            </div>
+            <div class="grid2" style="flex:0 0 auto">
+              <div class="card"><h3>事实表<span class="n" id="factN">0</span></h3><div id="factList"><div class="empty"><span class="big">◌</span>运行后由 facts.extract 生成</div></div></div>
+              <div class="card"><h3>合规预扫</h3><div id="compList"><div class="empty"><span class="big">◌</span>运行后由 compliance.scan 生成</div></div></div>
+            </div>
+          </div>
+
+          <div class="col scroll">
+            <div class="card" style="flex:1 0 auto;display:flex;flex-direction:column;min-height:0">
+              <h3>执行记录<span class="n" id="planSrc">—</span></h3>
+              <div id="tl" style="min-height:220px;overflow:auto"><div class="empty"><span class="big">◌</span>还没有执行。<br>点「开始生成」，每一步都是真实的工具调用。</div></div>
+            </div>
+            <div class="card">
+              <h3>运行时账本</h3>
+              <div class="kv"><span>工具调用</span><b id="lCalls">0</b></div>
+              <div class="kv"><span>模型调用</span><b id="lLlm">0</b></div>
+              <div class="kv"><span>上下文长度</span><b id="lChars">0</b> 字符</div>
+              <div class="kv"><span>墙钟耗时</span><b id="lMs">0</b> ms</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 审片台 -->
+      <section class="pane" id="pane-review">
+        <div class="gridwrap">
+          <div class="card">
+            <h3>审片结论</h3>
+            <div id="revHead"><div class="empty"><span class="big">◌</span>还没有可审的素材</div></div>
+            <div id="revChecks" class="checks" style="margin-top:12px"></div>
+          </div>
+          <div class="card">
+            <h3>打回与修复记录</h3>
+            <div id="revFixes"><p class="sec-note">审片 Agent 每次打回都会写清原因、修法与轮次，修复后自动重跑 8 项判定。</p></div>
+            <h3 style="margin-top:14px">交付</h3>
+            <div class="rowbtns"><button class="btn ghost sm" id="expTxt2">文案</button><button class="btn ghost sm" id="expSrt2">SRT</button><button class="btn ghost sm" id="expCsv2">分镜</button><button class="btn ghost sm" id="expMd2">报告</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 批处理 -->
+      <section class="pane" id="pane-batch">
+        <div class="gridwrap">
+          <div class="card">
+            <h3>批量清单<span class="n">一行一个 brief</span></h3>
+            <label class="f">最多 40 行，空行与过短行自动跳过</label>
+            <textarea id="batchBox" style="height:180px">保温杯 316L 不锈钢，容量 500ml，12 小时保温，一键开盖，79 元，通勤上班族
+咖啡豆 深烘 意式拼配，454g，油脂厚，坚果可可，售价 118 元，手冲与意式都行
+宠物冻干零食 鸡肉味，100g，冻干工艺，蛋白质 40g，49.9 元，猫犬通用</textarea>
+            <div class="rowbtns"><button class="btn" id="btnBatchRun">批量审片</button><button class="btn ghost" id="btnBatchCsv">导出汇总</button></div>
+            <p class="hint">每行都走同一套工具链：解析 → 事实 → 合规 → 起草 → 审片 → 修订；批量模式仅审片，不授权交付。</p>
+          </div>
+          <div class="card">
+            <h3>结果<span class="n" id="batchN">0</span></h3>
+            <div id="batchTable"><div class="empty"><span class="big">◌</span>还没有批量结果</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 记忆 -->
+      <section class="pane" id="pane-memory">
+        <div class="gridwrap">
+          <div class="card">
+            <h3>运行记忆<span class="n">localStorage · 只读复用</span></h3>
+            <div id="memStats" class="grid3" style="margin-bottom:12px"></div>
+            <div id="memList"><div class="empty"><span class="big">◌</span>记忆为空</div></div>
+          </div>
+          <div class="card">
+            <h3>记忆怎么用</h3>
+            <p class="sec-note">每次运行结束，Agent 调 memory.write 写入一条记录（商品、平台、分数、轮次、首次退回项）。下次同类 brief 先调 memory.recall，把「上次是被哪条打回的」传给模型起草作为历史参考。<br><br>记忆只影响起草提示，<b>不参与判定</b>——判定永远来自 8 项硬指标，避免自证。</p>
+            <div class="rowbtns"><button class="btn ghost sm" id="btnMemClear2">清空记忆</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 轨迹 -->
+      <section class="pane" id="pane-trace">
+        <div class="card">
+          <h3>完整执行轨迹<span class="n" id="traceN">0 events</span></h3>
+          <div class="rowbtns" style="margin:0 0 12px"><button class="btn ghost sm" id="btnTraceJson">导出 trace.json</button><button class="btn ghost sm" id="btnTraceCopy">复制</button></div>
+          <pre id="tracePre" style="background:var(--paper2);border:1px solid var(--line);border-radius:8px;padding:12px;font:11.5px/1.55 var(--mono);max-height:66vh;overflow:auto;white-space:pre-wrap">空闲</pre>
+        </div>
+      </section>
+
+      <!-- 设置 -->
+      <section class="pane" id="pane-settings">
+        <div class="gridwrap">
+          <div class="card">
+            <h3>模型接入<span class="n" id="setCur">offline</span></h3>
+            <p class="sec-note">显式选择离线时，工作流用<b>本地确定性规划器</b>跑完整的 plan→act→observe→repair 循环（同一输入可复现）。填入任意 OpenAI 兼容端点或本机 Ollama，规划、起草与改写交给模型，循环结构不变。</p>
+            <label class="f">Base URL（例：http://127.0.0.1:11434 或 https://api.deepseek.com/v1）</label>
+            <input type="text" id="cfgBase" placeholder="留空 = 离线确定性策略">
+            <label class="f">API Key（Ollama 可留空；仅保留在当前页面内存，刷新需重填）</label>
+            <input type="password" id="cfgKey" placeholder="sk-…">
+            <label class="f">模型名</label>
+            <input type="text" id="cfgModel" placeholder="gpt-4o-mini / qwen2.5:7b / deepseek-chat">
+            <div class="rowbtns"><button class="btn" id="btnCfgSave">保存并探测</button><button class="btn ghost" id="btnCfgReset">回到离线</button></div>
+            <p class="hint" id="cfgNote">当前：offline · 未发起任何网络请求。</p>
+          </div>
+          <div class="card">
+            <h3>工具契约<span class="n" id="schemaN">0</span></h3>
+            <div id="schemaList"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <h3 id="apTitle">需要人工确认</h3>
+    <p id="apBody">这个工具会写入/交付外部产物，Agent 停下来等你批准。</p>
+    <pre id="apArgs">{}</pre>
+    <div class="acts"><button class="btn ghost" id="apNo">拒绝</button><button class="btn copper" id="apYes">允许并继续</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- 旧引擎需要的锚点（渲染与判定逻辑复用，不重复实现） -->
+<div class="hidden" id="legacy">
+  <div id="segs"><div></div><div></div><div></div><div></div></div>
+  <div id="live"></div><div id="liveTxt"></div><div id="log"></div><div id="facts"></div>
+  <div id="checks"></div><div id="score"></div><div id="scoreNote"></div><div id="stageMs"></div>
+  <div id="stageSeed"></div><div id="verdict"></div><div id="mem"></div><div id="phone"></div>
+  <textarea id="batch"></textarea><div id="bTable"></div>
+  <button id="btnRun"></button><button id="btnPlay"></button><button id="btnRec"></button>
+  <button id="btnCover"></button><button id="btnReport"></button><button id="btnTrace"></button>
+  <button id="btnBatch"></button><button id="btnCsv"></button><button id="btnTxt"></button>
+  <button id="btnSrt"></button><button id="btnSht"></button><button id="btnMemClear"></button>
+</div>
+
+<script src="core/engine.js"></script>
+<script src="core/llm.js"></script>
+<script src="core/tools.js"></script>
+<script src="core/agent.js"></script>
+<script src="ui/shell.js"></script>
+<script src="ui/studio.js"></script>
+</body>
+</html>
