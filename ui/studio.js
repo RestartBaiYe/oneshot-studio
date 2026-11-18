@@ -35,7 +35,7 @@
   if(window.ONESHOT_DEMO){
     var welcome=node('section','card demo-welcome');welcome.innerHTML='<div><span class="eyebrow">免配置 · 离线交互演示</span><h3>选一个场景，立即开始。</h3><p>本地规则实时执行，无需账号或密钥。审阅结果后点击批准，即可下载文件。</p><p>这是离线工作流演示，不调用大模型；修订场景会明确注入一条不支持的参数。</p></div><div class="rowbtns"><button id="demoQuick" class="btn">一键体验完整流程 →</button><button id="demoRepair" class="btn ghost">演示错误拦截与修订</button></div>';
     q('.workspace-intro').after(welcome);
-    function startDemo(repair){if(Agent.state.running)return;q('#brief').value=BRIEFS[0].b;q('#platform').value='douyin';q('#bait').checked=repair;q('#brief').dispatchEvent(new Event('input',{bubbles:true}));LLM.active='offline';q('#railProviderTxt').textContent='离线交互演示 · 无模型调用';q('#btnStart2').click();}
+    function startDemo(repair){if(Agent.state.running)return;q('#brief').value='保温杯 316L 不锈钢，容量 500ml，12 小时保温，一键开盖单手可开，食品级硅胶圈。售价 79 元，主打通勤上班族和学生党，今天下单送杯刷。';q('#platform').value='douyin';q('#bait').checked=repair;q('#brief').dispatchEvent(new Event('input',{bubbles:true}));LLM.active='offline';q('#railProviderTxt').textContent='离线交互演示 · 无模型调用';q('#btnStart2').click();}
     q('#demoQuick').onclick=function(){startDemo(false);};q('#demoRepair').onclick=function(){startDemo(true);};
     q('#nextAction').textContent='直接点击「一键体验完整流程」，或选择「演示错误拦截与修订」。无需配置。';
     q('#railProviderTxt').textContent='离线交互演示 · 无模型调用';
