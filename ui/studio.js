@@ -3,16 +3,14 @@
   var q=function(s){return document.querySelector(s);}, running=false, history=[], plan=[], current=-1;
   function node(tag,cls,text){var el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
   function panel(title,id){var el=node('section','card studio-panel');el.appendChild(node('h3','',title));var body=node('div','',undefined);body.id=id;el.appendChild(body);return el;}
-  var toolbar=node('div','studio-toolbar');toolbar.innerHTML='<span class="studio-label">CONTENT OPERATIONS / WORKSPACE</span><button class="btn ghost sm" id="themeSwitch" aria-pressed="true">切换浅色</button>';
+  var toolbar=node('div','studio-toolbar');toolbar.innerHTML='<span class="studio-label">CONTENT OPERATIONS / WORKSPACE</span><button class="btn ghost sm" id="themeSwitch" aria-pressed="false">切换深色</button>';
   q('#pane-desk').prepend(toolbar);
-  var visual=node('div','pipeline-art');visual.setAttribute('aria-label','商品事实经过规则审片，再由人工批准交付');visual.innerHTML='<div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><span class="pipeline-kicker">ONESHOT / CONTROLLED DELIVERY</span><div class="pipeline-nodes"><span>商品事实<small>BRIEF</small></span><i>→</i><span class="pipeline-core">审片<small>REVIEW</small></span><i>→</i><span>人工批准<small>APPROVAL</small></span></div><span class="pipeline-caption">每次修订留下依据 · 每次交付经过批准</span>';q('.workspace-intro').appendChild(visual);
-  var scope=node('p','scope-note','为电商内容运营准备投前脚本。交付 TXT / SRT / CSV / 审片报告；8 项初筛通过并经人工批准后解锁导出。');q('.flow').after(scope);
   var evidence=node('button','btn ghost sm','下载运行证据 JSON');evidence.id='exportEvidence';evidence.disabled=true;q('#exports').appendChild(evidence);
-  evidence.onclick=function(){var result=Agent.state.result;if(!result)return;var record={version:'1.2',result:result,events:Agent.state.trace,policy:{maxSteps:Agent.limits.maxSteps,maxReviews:Agent.limits.maxReviews,maxMs:Agent.limits.maxMs},notice:'运行证据含本次商品输入和文案，不含 API 密钥；离线模式不是模型运行。'};var link=node('a');link.href=URL.createObjectURL(new Blob([JSON.stringify(record,null,2)],{type:'application/json'}));link.download='oneshot-run-evidence.json';link.click();setTimeout(function(){URL.revokeObjectURL(link.href);},1000);};document.documentElement.dataset.theme='dark';
+  evidence.onclick=function(){var result=Agent.state.result;if(!result)return;var record={version:'1.2',result:result,events:Agent.state.trace,policy:{maxSteps:Agent.limits.maxSteps,maxReviews:Agent.limits.maxReviews,maxMs:Agent.limits.maxMs},notice:'运行证据含本次商品输入和文案，不含 API 密钥；离线模式不是模型运行。'};var link=node('a');link.href=URL.createObjectURL(new Blob([JSON.stringify(record,null,2)],{type:'application/json'}));link.download='oneshot-run-evidence.json';link.click();setTimeout(function(){URL.revokeObjectURL(link.href);},1000);};
   q('#themeSwitch').onclick=function(){var dark=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=dark?'dark':'light';this.textContent=dark?'切换浅色':'切换深色';this.setAttribute('aria-pressed',String(dark));};
   var draft=node('div','draft-status','草稿仅保存在本机浏览器');draft.id='draftStatus';q('#brief').after(draft);
-  var progress=panel('本次任务 · 执行计划','executionPlan');q('.desk>.col').appendChild(progress);
-  var revisions=panel('审片版本 · 修改依据','revisionHistory');q('.stagecol').appendChild(revisions);
+  var progress=node('details','card studio-panel execution-plan');progress.appendChild(node('summary','','Agent 执行依据 · 展开工具输入与结果'));var planBody=node('div');planBody.id='executionPlan';progress.appendChild(planBody);q('.stagecol').appendChild(progress);
+  var revisions=panel('修订记录 · 为什么这样改','revisionHistory');q('#reviewEvidence').appendChild(revisions);
   var delivery=panel('交付清单 · 责任边界','deliveryChecklist');q('.delivery-card').appendChild(delivery);
   q('#executionPlan').appendChild(node('p','hint','运行后显示实际计划和工具状态。'));
   q('#revisionHistory').appendChild(node('p','hint','每次规则审片保留本轮文案、未过项与修改对比。'));
@@ -41,12 +39,12 @@
     return original.call(this,kind,p);
   };
   if(window.ONESHOT_DEMO){
-    document.body.classList.add("guided-demo");
-    var welcome=node('section','card demo-welcome');welcome.innerHTML='<div><span class="eyebrow">免配置 · 离线交互演示</span><strong>想先看完整结果？</strong><span>本地规则运行，不调用大模型；你仍需审阅并批准交付。</span></div><div class="rowbtns"><button id="demoQuick" class="btn">载入保温杯示例 →</button><button id="demoRepair" class="btn ghost">看一次错误拦截</button></div>';
-    q('.workspace-intro').after(welcome);
+    document.body.classList.add('guided-demo');
+    var welcome=node('section','card demo-welcome demo-welcome-compact');welcome.innerHTML='<span>离线体验 · 无模型调用</span><div class="rowbtns"><button id="demoQuick" class="btn ghost sm">运行示例</button><button id="demoRepair" class="btn ghost sm">演示修订</button></div>';q('#chips').after(welcome);
     function startDemo(repair){if(Agent.state.running)return;q('#brief').value='保温杯 316L 不锈钢，容量 500ml，12 小时保温，一键开盖单手可开，食品级硅胶圈。售价 79 元，主打通勤上班族和学生党，今天下单送杯刷。';q('#platform').value='douyin';q('#bait').checked=repair;q('#brief').dispatchEvent(new Event('input',{bubbles:true}));LLM.active='offline';q('#railProviderTxt').textContent='离线交互演示 · 无模型调用';q('#btnStart2').click();}
-    q('#demoQuick').onclick=function(){startDemo(false);};q('#demoRepair').onclick=function(){startDemo(true);};
-    q('#nextAction').textContent='先检查左侧 brief，再运行 Agent；右侧会出现可直接审阅的四句脚本。';
+    var quick=document.querySelector('#demoQuick');if(quick)quick.onclick=function(){startDemo(false);};
+    var repair=document.querySelector('#demoRepair');if(repair)repair.onclick=function(){startDemo(true);};
+    q('#nextAction').textContent='填写商品事实并运行 Agent。脚本通过规则初筛后，你可人工批准，再进入本机视频制作。';
     q('#railProviderTxt').textContent='离线交互演示 · 无模型调用';
   }
   var media=matchMedia('(prefers-reduced-motion: reduce)');

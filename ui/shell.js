@@ -34,14 +34,19 @@
   function invalidateInput(){ if(Agent.state.running || batchRunning)return; LAST=null; STORY=null; renderScript([]); document.querySelectorAll("#exports button, #expTxt2, #expSrt2, #expCsv2, #expMd2").forEach(function(b){b.disabled=true;}); $("#gateNote").textContent="商品或平台已修改，请重新运行并审批。"; $("#statusTxt").textContent="输入已更新"; $("#status").className="status"; phase(0,"输入已更新，运行 Agent 生成本次脚本。"); }
   $("#brief").addEventListener("input",invalidateInput);
   $("#platform").addEventListener("change",invalidateInput);
-  $("#openReview").onclick=function(){go("review");};
   $("#showcase").onclick=function(){var on=document.body.classList.toggle("showcase");this.textContent=on?"退出演示视图":"演示视图";};
   /* ---------- 导航 ---------- */
   function go(pane) {
-    $$("#nav button").forEach(function (b) { b.classList.toggle("on", b.dataset.pane === pane); });
-    $$(".pane").forEach(function (p) { p.classList.toggle("on", p.id === "pane-" + pane); });
+    var selected = pane === "delivery" || pane === "media" || pane === "review" ? "delivery" : pane;
+    var target = pane === "delivery" ? "review" : pane;
+    $$("#nav button[data-pane]").forEach(function (b) { b.classList.toggle("on", b.dataset.pane === selected); });
+    $$(".pane").forEach(function (p) { p.classList.toggle("on", p.id === "pane-" + target); });
   }
-  $$("#nav button").forEach(function (b) { b.onclick = function () { go(b.dataset.pane); }; });
+  $$("#nav button[data-pane]").forEach(function (b) { b.onclick = function () { go(b.dataset.pane); }; });
+  var videoStep=document.querySelector("#goVideoWorkshop"); if(videoStep) videoStep.onclick=function(){go("media");};
+  $("#openReview").onclick=function(){go("delivery");};
+  $("#goExistingVideo").onclick=function(){go("media");};
+  $("#backToReview").onclick=function(){go("delivery");};
 
   /* ---------- 注册表 / 契约 / 预算 ---------- */
   function renderRegistry() {

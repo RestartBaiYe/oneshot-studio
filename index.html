@@ -5,21 +5,22 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>OneShot Studio · 电商内容运营 Agent</title>
 <link rel="stylesheet" href="assets/app.css">
-<link rel="stylesheet" href="assets/studio.css">
-<link rel="stylesheet" href="assets/media.css?v=localffmpeg1">
+<link rel="stylesheet" href="assets/media.css?v=journey-final">
+<link rel="stylesheet" href="assets/studio.css?v=journey-final">
 </head>
 <body>
 <div id="app">
   <aside class="rail">
     <div class="brand"><div class="mark"></div><div><b>OneShot</b><span>STUDIO · AGENT</span></div></div>
     <nav class="nav" id="nav">
-      <button data-pane="desk" class="on"><span class="ic">▤</span>作业台</button>
-      <button data-pane="review"><span class="ic">✓</span>脚本审片<span class="badge" id="navReview">—</span></button>
-      <button data-pane="media"><span class="ic">▶</span>视频工坊</button>
-      <button data-pane="batch"><span class="ic">≡</span>清单批处理</button>
-      <button data-pane="memory"><span class="ic">◈</span>记忆库<span class="badge" id="navMem">0</span></button>
-      <button data-pane="trace"><span class="ic">⇄</span>执行轨迹</button>
-      <button data-pane="settings"><span class="ic">⚙</span>运行设置</button>
+      <button data-pane="desk" class="on"><span class="ic">01</span>创作脚本</button>
+      <button data-pane="delivery"><span class="ic">02</span>审片与交付<span class="badge" id="navReview">—</span></button>
+      <details class="nav-more"><summary>工作区与设置</summary>
+        <button data-pane="batch"><span class="ic">≡</span>批量任务</button>
+        <button data-pane="memory"><span class="ic">◈</span>记忆库<span class="badge" id="navMem">0</span></button>
+        <button data-pane="trace"><span class="ic">⇄</span>执行记录</button>
+        <button data-pane="settings"><span class="ic">⚙</span>模型设置</button>
+      </details>
     </nav>
     <div class="sp"></div>
     <div class="railfoot">
@@ -39,21 +40,21 @@
       </div>
       <span class="status" id="status"><span class="d"></span><span id="statusTxt">待命</span></span>
       <button class="btn ghost sm" id="btnStop">停止</button>
-      <button class="btn copper" id="btnStart">开始生成 ⌘↵</button>
+      <button class="btn copper" id="btnStart">生成脚本</button>
     </header>
 
     <main>
       <!-- 作业台 -->
       <section class="pane on" id="pane-desk">
-        <div class="workspace-intro"><div><span class="eyebrow">FROM BRIEF TO DELIVERY</span><h2>把商品事实，变成敢交付的 15 秒脚本。</h2><p>给 Agent 一段真实 brief。它会提取事实、生成四句脚本、拦截无依据表达，最后把批准权交回给你。</p><div class="intro-proof"><span>输入：商品事实</span><i>→</i><span>产出：脚本 + 审片依据</span></div></div><button class="btn ghost" id="showcase">演示视图</button></div>
-<div class="flow" aria-label="任务流程"><span data-phase="0" class="active">01 输入事实</span><span data-phase="1">02 生成脚本</span><span data-phase="2">03 拦截风险</span><span data-phase="3">04 人工交付</span></div><p id="nextAction" role="status" aria-live="polite">先检查左侧 brief，再运行 Agent；右侧会出现可直接审阅的四句脚本。</p><div class="desk">
+        <div class="workspace-intro"><div><span class="eyebrow">电商短视频 · 从商品事实到交付</span><h2>先把脚本写对，再把视频交付。</h2><p>输入真实卖点 → 检查四句脚本 → 人工批准 → 本机制作 MP4。</p></div><div class="intro-actions"><button class="btn ghost sm" id="goExistingVideo">检查已有视频 ↗</button><button class="btn ghost sm" id="showcase">演示视图</button></div></div>
+<div class="flow" aria-label="任务流程"><span data-phase="0" class="active">01 输入事实</span><span data-phase="1">02 生成脚本</span><span data-phase="2">03 审查风险</span><span data-phase="3">04 批准交付</span></div><p id="nextAction" role="status" aria-live="polite">左侧填商品事实；点击“运行 Agent”，在右侧逐句检查脚本与证据。</p><div class="desk">
           <div class="col scroll">
             <div class="card">
               <h3>01 · 商品与任务<span class="n" id="taskId">NEW</span></h3>
-              <label class="f">商品 brief（Agent 的唯一事实来源）</label>
+              <label class="f" for="brief">商品信息 · 名称、卖点、价格、目标人群</label>
               <textarea id="brief">保温杯 316L 不锈钢，容量 500ml，12 小时保温，一键开盖单手可开，食品级硅胶圈。售价 79 元，主打通勤上班族和学生党，今天下单送杯刷。</textarea>
               <div class="chips" id="chips"></div>
-              <label class="f">投放平台（决定字幕字数上限）</label>
+              <label class="f" for="platform">发布平台 · 选择字幕长度规则</label>
               <select id="platform">
                 <option value="douyin">抖音 · 单行 14 字 / 钩子 12 字</option>
                 <option value="shipinhao">视频号 · 单行 16 字 / 钩子 14 字</option>
@@ -64,7 +65,7 @@
                 <span style="font-size:12px;color:var(--ink2)">注入一次幻觉（"实测 24 小时"），演示事实守卫如何打回</span>
               </label></details>
               <div class="rowbtns"><button class="btn" id="btnStart2">运行 Agent</button><button class="btn ghost" id="btnClear">清空轨迹</button></div>
-              <p class="hint">成功标准：8 项规则初筛通过、字幕不折行、数字在 brief 命中（不等于完整语义核验）、单条审片 ≤3 轮。</p>
+              <p class="hint">仅使用你提供的事实。规则初筛不替代人工判断；最多审查 3 轮。</p>
             </div>
             <details class="card technical"><summary>工具与执行契约</summary>
               <h3>工具注册表<span class="n" id="toolN">0</span></h3>
@@ -78,7 +79,7 @@
             </details>
           </div>
 
-          <div class="stagecol"><div class="card script-card"><h3>02 · 分镜脚本 <span class="n">15 秒 / 4 个镜头</span></h3><div id="scriptOutput" aria-live="polite"><div class="script-empty"><span>你的下一条内容，从这里开始</span><p>运行后展示钩子、卖点、证据与行动引导。每行文字可直接审阅。</p></div></div><button class="btn ghost sm" id="openReview">查看完整审片 →</button></div><details class="preview-details"><summary>代码分镜预览 · 非 AI 生成视频</summary>
+          <div class="stagecol"><div class="card script-card"><h3>02 · 分镜脚本 <span class="n">15 秒 / 4 个镜头</span></h3><div id="scriptOutput" aria-live="polite"><div class="script-empty"><span>这里会出现你的四句脚本</span><p>运行左侧任务后，逐句查看开场、卖点、证据和行动引导。批准后可制作 MP4 与下载配套文件。</p></div></div><button class="btn ghost sm" id="openReview">查看检查依据 / 继续制作 →</button></div><details class="preview-details"><summary>代码分镜预览 · 非 AI 生成视频</summary>
             <div class="stage">
               <div class="phone"><canvas id="cv" width="1080" height="1920"></canvas></div>
               <div class="transport">
@@ -105,7 +106,7 @@
             </div>
           </div>
 
-          <div class="col scroll">
+          <details class="card execution-details"><summary>开发者详情 · 工具轨迹与计量</summary><div class="execution-grid">
             <div class="card" style="flex:1 0 auto;display:flex;flex-direction:column;min-height:0">
               <h3>执行记录<span class="n" id="planSrc">—</span></h3>
               <div id="tl" style="min-height:220px;overflow:auto"><div class="empty"><span class="big">◌</span>还没有执行。<br>点「开始生成」，每一步都是真实的工具调用。</div></div>
@@ -117,16 +118,16 @@
               <div class="kv"><span>上下文长度</span><b id="lChars">0</b> 字符</div>
               <div class="kv"><span>墙钟耗时</span><b id="lMs">0</b> ms</div>
             </div>
-          </div>
+          </div></details>
         </div>
       </section>
 
       <!-- 审片台 -->
       <section class="pane" id="pane-review">
-        <div class="gridwrap">
+        <div class="delivery-stage"><div class="step-heading"><span>02 / REVIEW & DELIVERY</span><h2>检查脚本与风险，再制作成片</h2><p>先查看规则预检与修订依据，通过后继续制作 MP4，或检查已有视频。</p><button class="btn" id="goVideoWorkshop">继续：制作或检查视频 →</button></div><div class="gridwrap">
           <div class="card">
             <h3>审片结论</h3>
-            <div id="revHead"><div class="empty"><span class="big">◌</span>还没有可审的素材</div></div>
+            <div id="revHead"><div class="empty"><span class="big">◌</span>尚未生成脚本。请先在「创作脚本」运行任务；已有视频可直接进入技术检查。</div></div>
             <div id="revChecks" class="checks" style="margin-top:12px"></div>
           </div>
           <div class="card">
@@ -135,10 +136,10 @@
             <h3 style="margin-top:14px">交付</h3>
             <div class="rowbtns"><button class="btn ghost sm" id="expTxt2">文案</button><button class="btn ghost sm" id="expSrt2">SRT</button><button class="btn ghost sm" id="expCsv2">分镜</button><button class="btn ghost sm" id="expMd2">报告</button></div>
           </div>
-        </div>
+        </div><div id="reviewEvidence"></div></div>
       </section>
 
-      <section class="pane" id="pane-media"><div class="media-intro"><span class="eyebrow">ONESHOT · VIDEO PRODUCTION</span><h2>把已审脚本，制作成能交付的短视频</h2><p>本页调用你本机运行的 FFmpeg 服务生成 H.264 MP4；也可把现有视频交给同一服务做技术检查。视频不上传到 OneShot 云端，不自动发布。</p><div class="local-service"><span id="mediaServiceDot" class="service-dot"></span><b id="mediaServiceState">正在检查本机制作服务…</b><button class="btn ghost sm" id="mediaServiceCheck">重新连接</button><a href="../media-service/README.md" target="_blank" rel="noreferrer">安装与启动说明 ↗</a></div></div><div class="media-columns"><article class="card"><span class="media-step">01 / MAKE A VIDEO</span><h3>商品图 + 四句脚本 → MP4</h3><p>先在「作业台」完成脚本审阅与人工批准，再选择商品图。本机按四句脚本制作四段动态字幕场景。</p><label class="f" for="productImages">商品图（最多 8 张，PNG / JPEG / WebP，每张 ≤12 MB）</label><input id="productImages" type="file" multiple accept="image/png,image/jpeg,image/webp"><div class="video-fields"><label class="f">成片时长<select id="videoDuration"><option value="16">16 秒</option><option value="12">12 秒</option><option value="20">20 秒</option><option value="30">30 秒</option></select></label><label class="f">画面比例<select id="videoRatio"><option value="9:16">竖屏 9:16（1080×1920）</option></select></label></div><div class="media-note">真实 H.264 MP4 + SRT 字幕 + JPG 封面 + JSON 分镜与制作报告。模板背景和用户商品图，不生成视频素材或配音。</div><button class="btn" id="makeVideo" disabled>连接服务后制作 MP4</button><div id="renderFiles" class="render-files" aria-live="polite"></div></article><article class="card"><span class="media-step">02 / REVIEW EXISTING VIDEO</span><h3>现有成片技术检查</h3><p>FFmpeg / FFprobe 检查视频元数据、黑场区段和显著镜头变化阈值，并生成可下载的技术报告。</p><label class="f" for="reviewVideo">上传视频（≤500 MB、最长 15 分钟）</label><input id="reviewVideo" type="file" accept="video/*"><div id="videoMeta" class="media-note">视频通过 localhost 发给本机服务分析，不会上传到 OneShot 服务器。</div><button class="btn" id="runVideoReview" disabled>开始技术审查</button><div id="videoAnalysis" class="video-analysis" aria-live="polite"><p>等待选择文件；这里不判断剧情、广告法、商品真伪或画面审美。</p></div><button class="btn ghost" id="downloadVideoReport" disabled>下载 JSON 审查报告</button></article></div><p id="mediaStatus" class="media-status" role="status" aria-live="polite">检查本机服务后开始。脚本和商品图只发往 127.0.0.1。</p><p class="media-boundary">视频编码与像素指标在本机完成；已配置模型只参与作业台文案，不分析视频帧。AI 生成画面、AI 配音、人工语义/法律审片与平台发布均未接入。</p></section>
+      <section class="pane" id="pane-media"><div class="delivery-stage"><div class="step-heading"><span>03 / MAKE OR CHECK VIDEO</span><button class="btn ghost sm" id="backToReview">← 返回脚本检查</button><h2>制作成片，或检查已有视频</h2><p>本机 FFmpeg 生成真实视频与交付文件；上传视频可查技术指标，完成后下载。</p></div><div class="media-intro"><p>本页调用你本机运行的 FFmpeg 服务生成 H.264 MP4；也可把现有视频交给同一服务做技术检查。视频不上传到 OneShot 云端，不自动发布。</p><div class="local-service"><span id="mediaServiceDot" class="service-dot"></span><b id="mediaServiceState">正在检查本机制作服务…</b><button class="btn ghost sm" id="mediaServiceCheck">重新连接</button><a href="media-service/README.md" target="_blank" rel="noreferrer">安装与启动说明 ↗</a></div></div><div class="media-columns"><article class="card"><span class="media-step">01 / MAKE A VIDEO</span><h3>商品图 + 四句脚本 → MP4</h3><p>先在「创作脚本」完成脚本审阅与人工批准，再选择商品图。本机按四句脚本制作四段静态图片与字幕场景。</p><label class="f" for="productImages">商品图（最多 8 张，PNG / JPEG / WebP，每张 ≤12 MB）</label><input id="productImages" type="file" multiple accept="image/png,image/jpeg,image/webp"><div class="video-fields"><label class="f">成片时长<select id="videoDuration"><option value="16">16 秒</option><option value="12">12 秒</option><option value="20">20 秒</option><option value="30">30 秒</option></select></label><label class="f">画面比例<select id="videoRatio"><option value="9:16">竖屏 9:16（1080×1920）</option></select></label></div><div class="media-note">真实 H.264 MP4 + SRT 字幕 + JPG 封面 + JSON 分镜与制作报告。模板背景和用户商品图，不生成视频素材或配音。</div><button class="btn" id="makeVideo" disabled>连接服务后制作 MP4</button><div id="renderFiles" class="render-files" aria-live="polite"></div></article><article class="card"><span class="media-step">02 / REVIEW EXISTING VIDEO</span><h3>现有成片技术检查</h3><p>FFmpeg / FFprobe 检查视频元数据、黑场区段和显著镜头变化阈值，并生成可下载的技术报告。</p><label class="f" for="reviewVideo">上传视频（≤500 MB、最长 15 分钟）</label><input id="reviewVideo" type="file" accept="video/*"><div id="videoMeta" class="media-note">视频通过 localhost 发给本机服务分析，不会上传到 OneShot 服务器。</div><button class="btn" id="runVideoReview" disabled>开始技术审查</button><div id="videoAnalysis" class="video-analysis" aria-live="polite"><p>等待选择文件；这里不判断剧情、广告法、商品真伪或画面审美。</p></div><button class="btn ghost" id="downloadVideoReport" disabled>下载 JSON 审查报告</button></article></div><p id="mediaStatus" class="media-status" role="status" aria-live="polite">检查本机服务后开始。脚本和商品图只发往 127.0.0.1。</p><p class="media-boundary">视频编码与像素指标在本机完成；已配置模型只参与作业台文案，不分析视频帧。AI 生成画面、AI 配音、人工语义/法律审片与平台发布均未接入。</p></div></section>
 
       <!-- 批处理 -->
       <section class="pane" id="pane-batch">
@@ -237,8 +238,8 @@
 <script src="core/llm.js"></script>
 <script src="core/tools.js"></script>
 <script src="core/agent.js"></script>
-<script src="ui/shell.js"></script>
-<script src="ui/studio.js?v=localffmpeg1"></script>
-<script src="ui/media.js?v=localffmpeg1"></script>
+<script src="ui/shell.js?v=journey-final"></script>
+<script src="ui/studio.js?v=journey-final"></script>
+<script src="ui/media.js?v=journey-final"></script>
 </body>
 </html>

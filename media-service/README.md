@@ -1,23 +1,33 @@
 # OneShot 本机媒体服务
 
-浏览器 Pages 版本负责脚本工作流；本机 Node 服务负责视频编码与技术抽样。服务只绑定 `127.0.0.1`，不对局域网开放。
+完整程序包：https://restartbaiye.github.io/oneshot-studio/OneShot-Windows.zip
 
-## 启动
+## 启动完整工作台
 
-在项目根目录双击 `media-service/start.bat`，保持命令窗口运行，然后在「视频工坊」点击重新连接。默认端口为 `41739`。
+安装 Node.js 18+、FFmpeg/FFprobe（含 libx264 与 drawtext）并加入 PATH；Windows 使用系统微软雅黑字体。依赖不包含在本包中。
 
-运行环境需要 Node.js 18+、FFmpeg（含 libx264 和 drawtext）与微软雅黑字体。默认查找 `D:/Python314/Scripts/ffmpeg.exe` 和同目录 ffprobe；其他环境请设置 `FFMPEG_PATH`、`FFPROBE_PATH`。命令行启动：
+双击本目录的 start.bat，看到 listening 后打开 **http://127.0.0.1:41739/?demo=1**。不必另开静态服务器。保持服务窗口运行，Ctrl+C 停止。
 
-```sh
-node media-service/server.cjs
-```
+默认使用 PATH 中的 ffmpeg 和 ffprobe；自定义安装可在启动前设置 FFMPEG_PATH、FFPROBE_PATH。ONESHOT_PORT 可改端口。服务启动会验证两种可执行文件，缺失时直接报错。
 
-## 功能和限制
+命令行也可在项目根目录运行：
 
-- 四句已审脚本与最多 8 张 PNG/JPEG/WebP 商品图，制作 H.264 1080×1920、24 fps MP4。
-- 输出 MP4、SRT、JPG 封面、JSON 分镜和制作报告。静态商品图或模板背景加字幕；无视频生成素材、无音轨、无配音。
-- 上传视频后使用 FFprobe 读取元数据，并用 FFmpeg 黑场和画面变化阈值检测，输出 JSON 技术报告；分析结束即删除上传的原视频，仅保留报告。
-- 服务不调用模型，不判断语义、商品事实、广告法或美学，不自动发布。网页模型只参与文字工作流。
-- 商品图每张不超过 12 MB；视频不超过 500 MB、最长 15 分钟。成片、脚本配套文件与审查报告保留于本机项目 `deliveries/`；审查上传的原视频在任务结束时删除。停止服务后可手动删除 `deliveries/`。
+    node media-service/server.cjs
 
-服务绑定 `127.0.0.1` 并以 `shell:false` 启动 FFmpeg。不要将 41739 端口转发至公网。停止服务后可手动删除 `deliveries/`。Pages 用户可通过 `demo/media-service/README.md` 查看浏览器版安装指引。
+## 使用与故障
+
+- 填商品事实 → 生成四句脚本 → 人工批准 → 制作视频 → 下载五份文件。
+- 检查已有视频无需脚本审批：首页点击“检查已有视频”，上传并运行技术检查。
+- 网页提示未连接：检查服务窗口与端口，优先用本机网址；公共 Pages 可能被浏览器本地网络权限拦截。不要放开任意跨域来源。
+- 端口占用：关闭旧 OneShot 服务窗口，或设置 ONESHOT_PORT 后启动，不要结束其他应用。
+- 字体/编码报错：确认 FFmpeg 含 drawtext/libx264 且系统装有微软雅黑。本轮仅验证 Windows + Edge + FFmpeg 9.0.2，不承诺未经测试的系统兼容性。
+
+## 输出、边界与数据
+
+输出 H.264 1080×1920/24fps MP4、SRT、JPG、JSON 分镜与制作报告。画面是商品静态图/模板背景加字幕，无音轨，不是 AI 生成视频。
+
+技术检查仅包含时长/分辨率/编码、黑场与画面变化阈值，不做语义、法律、商品事实或审美判断。原视频在分析结束后删除（包括失败）；图像临时文件在编码结束后删除；成片和报告保留于项目 deliveries/，停止服务后可自行清理。
+
+最多 8 图，每图 12 MB；视频最多 500 MB、15 分钟。JSON/Base64 会产生额外内存占用，建议短视频。无云端上传、无模型调用、无自动发布。
+
+服务只绑定 127.0.0.1，限制 Host/Origin 与静态文件路径，shell:false 调用 FFmpeg。不要转发端口至公网。本机 API 不提供多用户鉴权；人工审批由网页工作流控制。
