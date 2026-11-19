@@ -374,13 +374,15 @@ function drawScene(i, lt, dur, p, subs, plat){
     ctx.fillText("分镜预览 · 规则初筛，需运营复核", 92, 1598);
   }
 }
+var PRODUCT_IMAGE = null;
+function setProductImage(img){ PRODUCT_IMAGE = img || null; if(STORY) drawAt(T); }
 function drawProduct(cx,cy,bw,bh,t,dark){
   var p=STORY&&STORY.p;ctx.save();ctx.translate(cx,cy+Math.sin(t)*8);
   ctx.fillStyle=dark?"#302B26":"#F0E8DC";roundRect(-bw/2,-bh/2,bw,bh,24);ctx.fill();
-  ctx.strokeStyle=C.copper;ctx.lineWidth=3;ctx.stroke();ctx.textAlign="center";
-  ctx.fillStyle=dark?C.white:C.ink;ctx.font="600 34px 'Microsoft YaHei',sans-serif";
-  wrap(p?p.name:"商品",7).forEach(function(s,i){ctx.fillText(s,0,-30+i*48);});
-  ctx.font="22px 'Microsoft YaHei',sans-serif";ctx.fillStyle=C.muted;ctx.fillText("商品图待上传",0,bh/2-46);ctx.restore();
+  ctx.save();roundRect(-bw/2+8,-bh/2+8,bw-16,bh-16,18);ctx.clip();
+  if(PRODUCT_IMAGE){var scale=Math.max((bw-16)/PRODUCT_IMAGE.width,(bh-16)/PRODUCT_IMAGE.height),iw=PRODUCT_IMAGE.width*scale,ih=PRODUCT_IMAGE.height*scale;ctx.drawImage(PRODUCT_IMAGE,-iw/2,-ih/2,iw,ih);}
+  else{ctx.fillStyle=dark?"#302B26":"#F0E8DC";ctx.fillRect(-bw/2,-bh/2,bw,bh);ctx.fillStyle=dark?C.white:C.ink;ctx.textAlign="center";ctx.font="600 34px 'Microsoft YaHei',sans-serif";wrap(p?p.name:"商品",7).forEach(function(s,i){ctx.fillText(s,0,-30+i*48);});ctx.font="22px 'Microsoft YaHei',sans-serif";ctx.fillStyle=C.muted;ctx.fillText("上传商品图以替换占位",0,bh/2-46);}
+  ctx.restore();ctx.strokeStyle=C.copper;ctx.lineWidth=3;roundRect(-bw/2,-bh/2,bw,bh,24);ctx.stroke();ctx.restore();
 }
 function drawChrome(t, dur, subs){
   var total = dur.reduce(function(a,b){return a+b;},0);

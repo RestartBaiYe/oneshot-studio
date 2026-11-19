@@ -6,6 +6,7 @@
 <title>OneShot Studio · 电商内容运营 Agent</title>
 <link rel="stylesheet" href="assets/app.css">
 <link rel="stylesheet" href="assets/studio.css">
+<link rel="stylesheet" href="assets/media.css?v=media1">
 </head>
 <body>
 <div id="app">
@@ -13,7 +14,8 @@
     <div class="brand"><div class="mark"></div><div><b>OneShot</b><span>STUDIO · AGENT</span></div></div>
     <nav class="nav" id="nav">
       <button data-pane="desk" class="on"><span class="ic">▤</span>作业台</button>
-      <button data-pane="review"><span class="ic">✓</span>审片台<span class="badge" id="navReview">—</span></button>
+      <button data-pane="review"><span class="ic">✓</span>脚本审片<span class="badge" id="navReview">—</span></button>
+      <button data-pane="media"><span class="ic">▶</span>视频工坊</button>
       <button data-pane="batch"><span class="ic">≡</span>清单批处理</button>
       <button data-pane="memory"><span class="ic">◈</span>记忆库<span class="badge" id="navMem">0</span></button>
       <button data-pane="trace"><span class="ic">⇄</span>执行轨迹</button>
@@ -136,6 +138,8 @@
         </div>
       </section>
 
+      <section class="pane" id="pane-media"><div class="media-intro"><span class="eyebrow">ONESHOT · VIDEO WORKSHOP</span><h2>从商品素材到可预览成片</h2><p>同一处完成两件事：把商品图和已审脚本做成短视频，或上传现有视频检查技术指标。文件在浏览器本地处理。</p></div><div class="media-columns"><article class="card"><span class="media-step">01 / CREATE</span><h3>生成商品短视频</h3><p>先在「作业台」运行 Agent 并检查脚本，再回到这里加入商品图。画面由本页 Canvas 绘制并编码为 WebM。</p><label class="f" for="productImages">商品主图（PNG / JPEG / WebP，≤12 MB）</label><input id="productImages" type="file" accept="image/png,image/jpeg,image/webp"><img id="mediaPreview" class="media-thumb" alt="本地商品图预览" hidden><div class="media-note">脚本 4 句映射为 4 个画面，字幕按本地固定时间点生成；不调用生成式视频 API，不含 AI 配音。</div><button class="btn" id="makeVideo">绘制并下载 15 秒 WebM + SRT</button><button class="btn ghost" id="downloadVideo" disabled>再次下载 WebM</button><button class="btn ghost" id="downloadMp4" disabled>导出 MP4（尚未配置编码器）</button><div class="rowbtns"><button class="btn ghost sm" id="downloadCover" disabled>封面 PNG</button><button class="btn ghost sm" id="downloadStoryboard" disabled>分镜 CSV</button><button class="btn ghost sm" id="downloadCreateReport" disabled>制作记录</button></div></article><article class="card"><span class="media-step">02 / REVIEW</span><h3>检查已有视频</h3><p>上传成片后，浏览器读取视频元数据并均匀抽样 20 帧，报告黑场估计与显著画面变化。</p><label class="f" for="reviewVideo">视频文件（MP4 / MOV / WebM，≤500 MB）</label><input id="reviewVideo" type="file" accept="video/mp4,video/quicktime,video/webm"><button class="btn" id="runVideoReview" disabled>运行本地技术抽样</button><div id="videoAnalysis" class="video-analysis" aria-live="polite"><p>等待上传。此检查不判断剧情、商品真实性、广告法或画面美观。</p></div><button class="btn ghost" id="downloadVideoReport" disabled>下载技术审查报告</button></article></div><p id="mediaStatus" class="media-status" role="status" aria-live="polite">先在作业台生成并审阅脚本，或直接上传视频做技术抽样。</p><p class="media-boundary">当前产出：WebM 成片、SRT、封面 PNG、分镜 CSV、制作记录；现有视频技术抽样报告。MP4 编码与语义级审片未接入；不会自动发布。</p></section>
+
       <!-- 批处理 -->
       <section class="pane" id="pane-batch">
         <div class="gridwrap">
@@ -234,6 +238,7 @@
 <script src="core/tools.js"></script>
 <script src="core/agent.js"></script>
 <script src="ui/shell.js"></script>
-<script src="ui/studio.js?v=journey2"></script>
+<script src="ui/studio.js?v=media1"></script>
+<script src="ui/media.js?v=media1"></script>
 </body>
 </html>
