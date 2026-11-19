@@ -31,17 +31,23 @@
     var labels=["钩子","卖点","证据","行动引导"], times=["00–03s","03–07s","07–11s","11–15s"];
     $("#scriptOutput").innerHTML=lines.length ? lines.map(function(s,i){return '<div class="script-line"><span class="shot-no">0'+(i+1)+'</span><div><small>'+labels[i]+' · '+times[i]+'</small><p>'+esc(s)+'</p></div></div>';}).join("") : '<div class="script-empty"><span>等待本轮脚本</span><p>生成后在这里逐行审阅，再决定是否交付。</p></div>';
   }
-  function invalidateInput(){ if(Agent.state.running || batchRunning)return; LAST=null; STORY=null; renderScript([]); document.querySelectorAll("#exports button, #expTxt2, #expSrt2, #expCsv2, #expMd2").forEach(function(b){b.disabled=true;}); $("#gateNote").textContent="商品或平台已修改，请重新运行并审批。"; $("#statusTxt").textContent="输入已更新"; $("#status").className="status"; phase(0,"输入已更新，运行 Agent 生成本次脚本。"); }
+  function invalidateInput(){ if(Agent.state.running || batchRunning)return; LAST=null; STORY=null; Agent.state.result=null; renderScript([]); document.querySelectorAll("#exports button, #expTxt2, #expSrt2, #expCsv2, #expMd2").forEach(function(b){b.disabled=true;}); $("#gateNote").textContent="商品或平台已修改，请重新运行并审批。"; $("#statusTxt").textContent="输入已更新"; $("#status").className="status"; phase(0,"输入已更新，运行 Agent 生成本次脚本。"); }
   $("#brief").addEventListener("input",invalidateInput);
   $("#platform").addEventListener("change",invalidateInput);
   $("#showcase").onclick=function(){var on=document.body.classList.toggle("showcase");this.textContent=on?"退出演示视图":"演示视图";};
   /* ---------- 导航 ---------- */
   function go(pane) {
-    var selected = pane === "delivery" || pane === "media" || pane === "review" ? "delivery" : pane;
-    var target = pane === "delivery" ? "review" : pane;
-    $$("#nav button[data-pane]").forEach(function (b) { b.classList.toggle("on", b.dataset.pane === selected); });
-    $$(".pane").forEach(function (p) { p.classList.toggle("on", p.id === "pane-" + target); });
+    var step = pane === "desk" ? "materials" : pane === "script" ? "script" : pane === "delivery" || pane === "review" ? "review" : pane === "media" ? "delivery" : "";
+    var target = pane === "delivery" ? "review" : pane === "script" ? "desk" : pane;
+    var selected = pane === "gallery" ? "gallery" : step ? "desk" : pane;
+    document.body.dataset.workstep = step;
+    document.body.dataset.surface = pane === "gallery" ? "gallery" : step ? "project" : "utility";
+    $$("#nav button[data-pane]").forEach(function(b){b.classList.toggle("on", b.dataset.pane === selected);});
+    $$(".pane").forEach(function(p){p.classList.toggle("on",p.id === "pane-" + target);});
+    $$("[data-workstep]").filter(function(el){return el.tagName === "BUTTON";}).forEach(function(b){var on=b.dataset.workstep === step;b.classList.toggle("on",on);if(on)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");});
+    window.dispatchEvent(new CustomEvent("oneshot:navigate",{detail:{pane:pane,step:step}}));
   }
+  window.Workbench = {go:go,busy:function(){return Agent.state.running || batchRunning;}};
   $$("#nav button[data-pane]").forEach(function (b) { b.onclick = function () { go(b.dataset.pane); }; });
   var videoStep=document.querySelector("#goVideoWorkshop"); if(videoStep) videoStep.onclick=function(){go("media");};
   $("#openReview").onclick=function(){go("delivery");};
@@ -141,7 +147,7 @@
     $("#apArgs").textContent = JSON.stringify(args, null, 2);
     if (STORY && STORY.subs) renderScript(STORY.subs);
     $("#apBody").textContent = "请核对以下四行文案。批准后开放 TXT、SRT、CSV 与审片报告的本地导出。规则初筛不代替人工内容审核。";
-    $("#apArgs").textContent = (STORY && STORY.subs ? STORY.subs.map(function(s,i){return ["钩子","卖点","证据","行动引导"][i] + "：" + s;}).join("\n\n") : "脚本未生成") + "\n\n交付范围：仅开放本次任务的本地文件导出。";
+    $("#apArgs").textContent = (STORY && STORY.subs ? STORY.subs.map(function(s,i){return ["钩子","卖点","证据","行动引导"][i] + "：" + s;}).join("\n\n") : "脚本未生成") + "\n\n批准范围：开放本次脚本文件导出，并允许使用这些文案在本机制作 MP4；不自动发布。";
     var previousFocus = document.activeElement, modal = $("#mask .modal");
     modal.setAttribute("role", "dialog"); modal.setAttribute("aria-modal", "true"); modal.setAttribute("aria-labelledby", "apTitle");
     $("#mask").classList.add("on");
@@ -371,7 +377,7 @@
   $("#btnTraceCopy").onclick = function () { navigator.clipboard && navigator.clipboard.writeText($("#tracePre").textContent); toast("已复制到剪贴板"); };
 
   /* ---------- 启动 ---------- */
-  $("#chips").innerHTML = BRIEFS.map(function (b, i) { return '<span class="chip" data-i="' + i + '">' + esc(b.n) + "</span>"; }).join("");
+  $("#chips").innerHTML = BRIEFS.map(function (b, i) { return '<button type="button" class="chip" data-i="' + i + '">' + esc(b.n) + "</button>"; }).join("");
   $$("#chips .chip").forEach(function (c) { c.onclick = function () { if(Agent.state.running || batchRunning)return toast("请先等待当前任务结束"); $("#brief").value = BRIEFS[+c.dataset.i].b; invalidateInput(); toast("已载入示例 brief：" + BRIEFS[+c.dataset.i].n); }; });
   $("#btnStart").onclick = run;
   $("#btnStart2").onclick = run;

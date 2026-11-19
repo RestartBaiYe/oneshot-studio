@@ -1,0 +1,20 @@
+{
+  "name": "oneshot-studio",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Local-first ecommerce video workflow with explicit preset examples and human approval",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node media-service/server.cjs",
+    "test": "node tests/runtime.cjs",
+    "test:ui": "node tests/ui.cjs",
+    "test:interaction": "node tests/interaction.cjs",
+    "samples:build": "node scripts/build-samples.cjs",
+    "package": "python scripts/package.py"
+  },
+  "devDependencies": {
+    "playwright-core": "1.65.1"
+  }
+}

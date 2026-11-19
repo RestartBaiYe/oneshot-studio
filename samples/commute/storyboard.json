@@ -1,0 +1,35 @@
+{
+  "duration": 12,
+  "canvas": "1080x1920",
+  "fps": 24,
+  "shots": [
+    {
+      "scene": 1,
+      "start": 0,
+      "end": 3,
+      "text": "保温杯，了解一下",
+      "visual": "商品静态图 + 字幕"
+    },
+    {
+      "scene": 2,
+      "start": 3,
+      "end": 6,
+      "text": "保温杯 316L 不锈钢",
+      "visual": "商品静态图 + 字幕"
+    },
+    {
+      "scene": 3,
+      "start": 6,
+      "end": 9,
+      "text": "容量500ml",
+      "visual": "商品静态图 + 字幕"
+    },
+    {
+      "scene": 4,
+      "start": 9,
+      "end": 12,
+      "text": "79元，查看详情",
+      "visual": "商品静态图 + 字幕"
+    }
+  ]
+}

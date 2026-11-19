@@ -1,0 +1,35 @@
+{
+  "duration": 12,
+  "canvas": "1080x1920",
+  "fps": 24,
+  "shots": [
+    {
+      "scene": 1,
+      "start": 0,
+      "end": 3,
+      "text": "咖啡豆 深烘意式拼配",
+      "visual": "商品静态图 + 字幕"
+    },
+    {
+      "scene": 2,
+      "start": 3,
+      "end": 6,
+      "text": "咖啡豆 深烘意式拼配",
+      "visual": "商品静态图 + 字幕"
+    },
+    {
+      "scene": 3,
+      "start": 6,
+      "end": 9,
+      "text": "454g",
+      "visual": "商品静态图 + 字幕"
+    },
+    {
+      "scene": 4,
+      "start": 9,
+      "end": 12,
+      "text": "118元，查看详情",
+      "visual": "商品静态图 + 字幕"
+    }
+  ]
+}

@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>OneShot Studio · 电商内容运营 Agent</title>
-<link rel="stylesheet" href="assets/app.css?v=art4">
-<link rel="stylesheet" href="assets/media.css?v=art4">
-<link rel="stylesheet" href="assets/studio.css?v=art4">
+<link rel="stylesheet" href="assets/app.css?v=gallery2">
+<link rel="stylesheet" href="assets/media.css?v=gallery2">
+<link rel="stylesheet" href="assets/studio.css?v=gallery2">
 </head>
 <body>
 <div id="app">
   <aside class="rail">
     <div class="brand"><div class="mark"></div><div><b>OneShot</b><span>STUDIO · AGENT</span></div></div>
     <nav class="nav" id="nav">
-      <button data-pane="desk" class="on"><span class="ic">01</span>创作工作台</button>
-      <button data-pane="delivery"><span class="ic">02</span>审查与成片<span class="badge" id="navReview">—</span></button>
+      <button data-pane="gallery" class="on"><span class="ic">◫</span>案例展厅</button><button data-pane="desk"><span class="ic">＋</span>当前任务</button>
+      <span id="navReview" hidden>—</span>
       <details class="nav-more"><summary>工作区与设置</summary>
         <button data-pane="batch"><span class="ic">≡</span>批量任务</button>
         <button data-pane="memory"><span class="ic">◈</span>记忆库<span class="badge" id="navMem">0</span></button>
@@ -44,8 +44,10 @@
     </header>
 
     <main>
+<section class="pane on" id="pane-gallery" aria-label="案例展厅"></section>
+<div class="project-chrome" id="projectChrome"><div class="project-heading"><button class="btn ghost sm" id="backGallery">← 案例展厅</button><div><span class="eyebrow">CURRENT PROJECT / 本次任务</span><h2 id="projectTitle">新建短片</h2></div><span id="taskMode" class="mode-label">离线规则 · 无模型调用</span></div><nav class="work-steps" aria-label="制作阶段"><button data-workstep="materials" data-go="desk">01 <b>素材</b><small>商品事实与图片</small></button><button data-workstep="script" data-go="script">02 <b>脚本</b><small>生成与逐镜检查</small></button><button data-workstep="review" data-go="review">03 <b>审查</b><small>风险与人工批准</small></button><button data-workstep="delivery" data-go="media">04 <b>交付</b><small>本次文件与成片</small></button></nav><p id="projectNotice" role="status">填写商品事实，然后生成脚本；所有批准仅适用于本次任务。</p></div>
       <!-- 作业台 -->
-      <section class="pane on" id="pane-desk">
+      <section class="pane" id="pane-desk">
         <div class="workspace-intro"><div><span class="eyebrow">ONESHOT STUDIO / 电商内容创作</span><h2><span>把商品信息，</span><span class="headline-finish">变成下一支短片<span class="title-dot">。</span></span></h2><p>为电商运营准备：写脚本、查风险、交付可下载的短片。</p></div><div class="intro-actions"><button class="btn ghost sm" id="goExistingVideo">检查已有视频 ↗</button><button class="btn ghost sm" id="showcase">演示视图</button></div></div>
 <div class="flow" aria-label="任务流程"><span data-phase="0" class="active">01 输入事实</span><span data-phase="1">02 生成脚本</span><span data-phase="2">03 审查风险</span><span data-phase="3">04 批准交付</span></div><p id="nextAction" role="status" aria-live="polite">左侧填商品事实；点击“运行 Agent”，在右侧逐句检查脚本与证据。</p><div class="desk">
           <div class="col scroll">
@@ -234,12 +236,14 @@
   <button id="btnSrt"></button><button id="btnSht"></button><button id="btnMemClear"></button>
 </div>
 
-<script src="core/engine.js?v=art4"></script>
-<script src="core/llm.js?v=art4"></script>
-<script src="core/tools.js?v=art4"></script>
-<script src="core/agent.js?v=art4"></script>
-<script src="ui/shell.js?v=art4"></script>
-<script src="ui/studio.js?v=art4"></script>
-<script src="ui/media.js?v=art4"></script>
+<script src="core/engine.js?v=gallery2"></script>
+<script src="core/llm.js?v=gallery2"></script>
+<script src="core/tools.js?v=gallery2"></script>
+<script src="core/agent.js?v=gallery2"></script>
+<script src="ui/shell.js?v=gallery2"></script>
+<script src="ui/studio.js?v=gallery2"></script>
+<script src="ui/media.js?v=gallery2"></script>
+<script src="samples/catalog.js?v=gallery2"></script>
+<script src="ui/gallery.js?v=gallery2"></script>
 </body>
 </html>

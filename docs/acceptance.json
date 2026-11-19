@@ -1,0 +1,289 @@
+{
+  "layouts": [
+    {
+      "surface": "gallery",
+      "theme": "light",
+      "width": 1280,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "light",
+      "width": 1024,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "light",
+      "width": 850,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "light",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "light",
+      "width": 390,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "light",
+      "width": 320,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "dark",
+      "width": 1280,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "dark",
+      "width": 1024,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "dark",
+      "width": 850,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "dark",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "dark",
+      "width": 390,
+      "overflow": 0
+    },
+    {
+      "surface": "gallery",
+      "theme": "dark",
+      "width": 320,
+      "overflow": 0
+    },
+    {
+      "surface": "materials",
+      "theme": "light",
+      "width": 1280,
+      "contrast": 14.422697136259155,
+      "overflow": 0,
+      "fg": "rgb(32, 35, 41)",
+      "bg": "rgb(245, 245, 243)",
+      "briefY": 383.109375
+    },
+    {
+      "surface": "materials",
+      "theme": "light",
+      "width": 1024,
+      "contrast": 14.422697136259155,
+      "overflow": 0,
+      "fg": "rgb(32, 35, 41)",
+      "bg": "rgb(245, 245, 243)",
+      "briefY": 372.109375
+    },
+    {
+      "surface": "materials",
+      "theme": "light",
+      "width": 850,
+      "contrast": 14.422697136259155,
+      "overflow": 0,
+      "fg": "rgb(32, 35, 41)",
+      "bg": "rgb(245, 245, 243)",
+      "briefY": 372.109375
+    },
+    {
+      "surface": "materials",
+      "theme": "light",
+      "width": 768,
+      "contrast": 14.422697136259155,
+      "overflow": 0,
+      "fg": "rgb(32, 35, 41)",
+      "bg": "rgb(245, 245, 243)",
+      "briefY": 372.109375
+    },
+    {
+      "surface": "materials",
+      "theme": "light",
+      "width": 390,
+      "contrast": 14.422697136259155,
+      "overflow": 0,
+      "fg": "rgb(32, 35, 41)",
+      "bg": "rgb(245, 245, 243)",
+      "briefY": 478.078125
+    },
+    {
+      "surface": "materials",
+      "theme": "light",
+      "width": 320,
+      "contrast": 14.422697136259155,
+      "overflow": 0,
+      "fg": "rgb(32, 35, 41)",
+      "bg": "rgb(245, 245, 243)",
+      "briefY": 478.078125
+    },
+    {
+      "surface": "materials",
+      "theme": "dark",
+      "width": 1280,
+      "contrast": 14.611512497929784,
+      "overflow": 0,
+      "fg": "rgb(240, 241, 245)",
+      "bg": "rgb(28, 31, 38)",
+      "briefY": 383.109375
+    },
+    {
+      "surface": "materials",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": 14.611512497929784,
+      "overflow": 0,
+      "fg": "rgb(240, 241, 245)",
+      "bg": "rgb(28, 31, 38)",
+      "briefY": 372.109375
+    },
+    {
+      "surface": "materials",
+      "theme": "dark",
+      "width": 850,
+      "contrast": 14.611512497929784,
+      "overflow": 0,
+      "fg": "rgb(240, 241, 245)",
+      "bg": "rgb(28, 31, 38)",
+      "briefY": 372.109375
+    },
+    {
+      "surface": "materials",
+      "theme": "dark",
+      "width": 768,
+      "contrast": 14.611512497929784,
+      "overflow": 0,
+      "fg": "rgb(240, 241, 245)",
+      "bg": "rgb(28, 31, 38)",
+      "briefY": 372.109375
+    },
+    {
+      "surface": "materials",
+      "theme": "dark",
+      "width": 390,
+      "contrast": 14.611512497929784,
+      "overflow": 0,
+      "fg": "rgb(240, 241, 245)",
+      "bg": "rgb(28, 31, 38)",
+      "briefY": 478.078125
+    },
+    {
+      "surface": "materials",
+      "theme": "dark",
+      "width": 320,
+      "contrast": 14.611512497929784,
+      "overflow": 0,
+      "fg": "rgb(240, 241, 245)",
+      "bg": "rgb(28, 31, 38)",
+      "briefY": 478.078125
+    }
+  ],
+  "previews": [
+    {
+      "id": "commute",
+      "videoWidth": 1080,
+      "report": "预置文件：12.00 秒 / 1080 × 1920 / h264\n\n检查来源：本地规则审查与 FFmpeg 编码（预先运行）\n\n脚本预检：1 轮 / 0 次模型调用"
+    },
+    {
+      "id": "coffee",
+      "videoWidth": 1080,
+      "report": "预置文件：12.00 秒 / 1080 × 1920 / h264\n\n检查来源：本地规则审查与 FFmpeg 编码（预先运行）\n\n脚本预检：2 轮 / 0 次模型调用"
+    },
+    {
+      "id": "blackframe",
+      "videoWidth": 1080,
+      "report": "预置文件：12.00 秒 / 1080 × 1920 / h264\n\n检查来源：FFmpeg 像素阈值检测（预先运行）\n\n预置报告中的黑场：3.00–3.79 秒\n\n跳到黑场 03.00s"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "OneShot-成片.mp4",
+      "bytes": 312497
+    },
+    {
+      "name": "OneShot-字幕.srt",
+      "bytes": 216
+    },
+    {
+      "name": "OneShot-封面.jpg",
+      "bytes": 85731
+    },
+    {
+      "name": "OneShot-分镜.json",
+      "bytes": 661
+    },
+    {
+      "name": "制作报告.json",
+      "bytes": 882
+    }
+  ],
+  "errors": [],
+  "execution": {
+    "actual": [
+      "memory.recall",
+      "brief.parse",
+      "facts.extract",
+      "script.draft",
+      "compliance.scan",
+      "subtitle.fit",
+      "review.judge",
+      "script.revise",
+      "subtitle.fit",
+      "review.judge",
+      "stage.preview",
+      "deliver.export",
+      "memory.write"
+    ],
+    "waiting": [],
+    "displayRows": 13,
+    "round": 2
+  },
+  "freshReview": {
+    "createdAt": "2026-11-19T12:07:52.146Z",
+    "metadata": {
+      "duration": 12,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "size": 200580,
+      "video": {
+        "codec": "h264",
+        "width": 1080,
+        "height": 1920,
+        "fps": "24/1",
+        "frames": 288
+      }
+    },
+    "blackSegments": [
+      {
+        "start": 3,
+        "end": 3.791667,
+        "duration": 0.791667
+      }
+    ],
+    "sceneChangeCount": 2,
+    "sceneChangeTimes": [
+      3,
+      3.791667
+    ],
+    "assessment": "本地技术指标和像素阈值；不判断语义、广告法、事实真实性或审美。",
+    "limitations": [
+      "深色画面可能被算作黑场",
+      "镜头变化来自 FFmpeg 阈值，不理解画面语义",
+      "分析结束后删除上传原视频，仅保留技术报告"
+    ]
+  }
+}

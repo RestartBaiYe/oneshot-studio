@@ -1,5 +1,7 @@
+deliveries/
+node_modules/
+test-results/
+_tmp/
 .env
 .env.*
-node_modules/
 *.log
-deliveries/

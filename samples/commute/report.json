@@ -1,0 +1,84 @@
+{
+  "createdAt": "2026-11-19T12:05:44.240Z",
+  "product": "保温杯 316L 不锈钢，容量500ml，12小时保温，一键开盖单手可开，售价79元，面向通勤上班族。",
+  "platform": "douyin",
+  "outputs": [
+    "OneShot-成片.mp4",
+    "OneShot-字幕.srt",
+    "OneShot-封面.jpg",
+    "OneShot-分镜.json",
+    "制作报告.json"
+  ],
+  "render": {
+    "duration": 12,
+    "format": "mov,mp4,m4a,3gp,3g2,mj2",
+    "size": 335166,
+    "video": {
+      "codec": "h264",
+      "width": 1080,
+      "height": 1920,
+      "fps": "24/1",
+      "frames": 288
+    },
+    "canvas": "1080x1920",
+    "fps": 24,
+    "videoCodec": "H.264",
+    "audio": "无",
+    "voiceover": "无"
+  },
+  "disclosure": "FFmpeg 编码；商品静态图/模板背景与字幕，非生成式视频，无 AI 配音。商品主张由用户提供，制作不为其真实性背书。",
+  "sampleNotice": "预置样例，非本次任务实时输出。原始商品示意图自行绘制，商品规格为演示输入，不代表真实商品承诺。",
+  "run": {
+    "status": "delivered",
+    "subs": [
+      "保温杯，了解一下",
+      "保温杯 316L 不锈钢",
+      "容量500ml",
+      "79元，查看详情"
+    ],
+    "round": 1,
+    "steps": [
+      {
+        "tool": "memory.recall",
+        "status": "success"
+      },
+      {
+        "tool": "brief.parse",
+        "status": "success"
+      },
+      {
+        "tool": "facts.extract",
+        "status": "success"
+      },
+      {
+        "tool": "script.draft",
+        "status": "success"
+      },
+      {
+        "tool": "compliance.scan",
+        "status": "success"
+      },
+      {
+        "tool": "subtitle.fit",
+        "status": "success"
+      },
+      {
+        "tool": "review.judge",
+        "status": "success"
+      },
+      {
+        "tool": "stage.preview",
+        "status": "success"
+      },
+      {
+        "tool": "deliver.export",
+        "status": "success"
+      },
+      {
+        "tool": "memory.write",
+        "status": "success"
+      }
+    ],
+    "llmCalls": 0
+  }
+}
