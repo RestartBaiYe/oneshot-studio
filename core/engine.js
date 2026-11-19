@@ -34,6 +34,8 @@ function extractFacts(brief){
   var params = brief.match(/(\d+(?:\.\d+)?)\s*(小时|分钟|天|℃|度|克|kg|ml|次|年|L|万次)/g) || [];
   params.forEach(function(p){ push("参数", p.replace(/\s+/g,"")); });
   var model = brief.match(/(\d{3,4}[A-Za-z])\b/); if(model) push("材质/型号", model[1]);
+  var materials=brief.match(/\b(?:316L|304|430)\b/gi)||[];materials.forEach(function(v){push("材质",v.toUpperCase());});
+  var weights=brief.match(/(\d+(?:\.\d+)?)\s*(g|kg|克|千克|ml|毫升|L|升)/gi)||[];weights.forEach(function(v){push("容量/重量",v.replace(/\s+/g,""));});
   return facts;
 }
 function briefNumbers(brief){ return brief.match(/\d+(?:\.\d+)?/g) || []; }

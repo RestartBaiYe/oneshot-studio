@@ -43,8 +43,8 @@
     <main>
       <!-- 作业台 -->
       <section class="pane on" id="pane-desk">
-        <div class="workspace-intro"><div><span class="eyebrow">FROM BRIEF TO DELIVERY</span><h2>让每一句卖点，都有据可查。</h2><p>输入商品信息，生成 15 秒脚本；审片通过后，由你决定交付。</p></div><button class="btn ghost" id="showcase">演示视图</button></div>
-<div class="flow" aria-label="任务流程"><span data-phase="0" class="active">01 商品输入</span><span data-phase="1">02 脚本生成</span><span data-phase="2">03 规则审片</span><span data-phase="3">04 批准交付</span></div><p id="nextAction" role="status" aria-live="polite">下一步：选择示例或填写商品信息，点击「运行 Agent」。当前模式见左下角。</p><div class="desk">
+        <div class="workspace-intro"><div><span class="eyebrow">FROM BRIEF TO DELIVERY</span><h2>把商品事实，变成敢交付的 15 秒脚本。</h2><p>给 Agent 一段真实 brief。它会提取事实、生成四句脚本、拦截无依据表达，最后把批准权交回给你。</p><div class="intro-proof"><span>输入：商品事实</span><i>→</i><span>产出：脚本 + 审片依据</span></div></div><button class="btn ghost" id="showcase">演示视图</button></div>
+<div class="flow" aria-label="任务流程"><span data-phase="0" class="active">01 输入事实</span><span data-phase="1">02 生成脚本</span><span data-phase="2">03 拦截风险</span><span data-phase="3">04 人工交付</span></div><p id="nextAction" role="status" aria-live="polite">先检查左侧 brief，再运行 Agent；右侧会出现可直接审阅的四句脚本。</p><div class="desk">
           <div class="col scroll">
             <div class="card">
               <h3>01 · 商品与任务<span class="n" id="taskId">NEW</span></h3>
@@ -129,7 +129,7 @@
           </div>
           <div class="card">
             <h3>打回与修复记录</h3>
-            <div id="revFixes"><p class="sec-note">审片 Agent 每次打回都会写清原因、修法与轮次，修复后自动重跑 8 项判定。</p></div>
+            <div id="revFixes"><p class="sec-note">每次规则审片列出未通过项；Agent 最多进行 3 轮规则修订与复核。规则初筛不是法律或语义审核。</p></div>
             <h3 style="margin-top:14px">交付</h3>
             <div class="rowbtns"><button class="btn ghost sm" id="expTxt2">文案</button><button class="btn ghost sm" id="expSrt2">SRT</button><button class="btn ghost sm" id="expCsv2">分镜</button><button class="btn ghost sm" id="expMd2">报告</button></div>
           </div>
@@ -234,6 +234,6 @@
 <script src="core/tools.js"></script>
 <script src="core/agent.js"></script>
 <script src="ui/shell.js"></script>
-<script src="ui/studio.js?v=turnkey2"></script>
+<script src="ui/studio.js?v=journey2"></script>
 </body>
 </html>

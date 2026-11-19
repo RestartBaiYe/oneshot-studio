@@ -123,10 +123,15 @@
     ["hook","claim","proof","cta"].forEach(function(k){if(typeof lines[k]!=="string"||!lines[k].trim()||lines[k].length>1000)throw new Error("文案字段无效："+k);});
   }
   function validate(id,a){
-    if(!get(id))throw new Error("未知工具");
-    if(typeof a.brief!=="string"||!a.brief.trim())throw new Error("brief 无效");
-    if(!root.PLAT[a.platform])throw new Error("未知平台");
-    if(["subtitle.fit","review.judge","stage.preview","deliver.export","script.revise"].indexOf(id)>=0)validateLines(a.lines);
+    var schemas={"memory.recall":["brief"],"brief.parse":["brief"],"facts.extract":["brief"],"compliance.scan":["text"],"script.draft":["brief","platform"],"subtitle.fit":["lines","platform"],"review.judge":["lines","brief","platform"],"stage.preview":["lines","brief","platform"],"deliver.export":["lines","brief","platform"],"memory.write":["brief","passed","total","rounds","first"],"script.revise":["lines"]};
+    if(!get(id)||!schemas[id])throw new Error("未知工具");
+    schemas[id].forEach(function(k){if(a[k]===undefined||a[k]===null)throw new Error("工具 "+id+" 缺少输入："+k);});
+    if(a.brief!==undefined&&(typeof a.brief!=="string"||!a.brief.trim()||a.brief.length>12000))throw new Error("brief 无效或超长");
+    if(a.text!==undefined&&(typeof a.text!=="string"||a.text.length>12000))throw new Error("text 无效或超长");
+    if(a.platform!==undefined&&!root.PLAT[a.platform])throw new Error("未知平台");
+    if(a.lines!==undefined)validateLines(a.lines);
+    if(id==="script.revise"&&(!a.lines||(!Array.isArray(a.fails)&&a.fails!==undefined)))throw new Error("修订输入无效");
+    if(id==="memory.write"&&(!Number.isInteger(a.passed)||!Number.isInteger(a.total)||!Number.isInteger(a.rounds)||!Array.isArray(a.first)))throw new Error("记忆写入字段无效");
   }
   function buildFiles(ctx){
     var subs=ctx.verdict.subs,plat=root.PLAT[ctx.platform],acc=0;
