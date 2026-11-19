@@ -142,8 +142,13 @@
     if (STORY && STORY.subs) renderScript(STORY.subs);
     $("#apBody").textContent = "请核对以下四行文案。批准后开放 TXT、SRT、CSV 与审片报告的本地导出。规则初筛不代替人工内容审核。";
     $("#apArgs").textContent = (STORY && STORY.subs ? STORY.subs.map(function(s,i){return ["钩子","卖点","证据","行动引导"][i] + "：" + s;}).join("\n\n") : "脚本未生成") + "\n\n交付范围：仅开放本次任务的本地文件导出。";
+    var previousFocus = document.activeElement, modal = $("#mask .modal");
+    modal.setAttribute("role", "dialog"); modal.setAttribute("aria-modal", "true"); modal.setAttribute("aria-labelledby", "apTitle");
     $("#mask").classList.add("on");
-    var done = function (v) { $("#mask").classList.remove("on"); $("#apYes").onclick = null; $("#apNo").onclick = null; resolve(v); };
+    var done = function (v) { $("#mask").classList.remove("on"); $("#mask").removeEventListener("keydown", modalKeys); $("#apYes").onclick = null; $("#apNo").onclick = null; if(previousFocus && previousFocus.isConnected) previousFocus.focus(); resolve(v); };
+    function modalKeys(e) { if(e.key === "Escape") { e.preventDefault(); e.stopPropagation(); done(false); } if(e.key === "Tab") { var buttons = Array.from(modal.querySelectorAll("button:not([disabled])")); var first = buttons[0], last = buttons[buttons.length-1]; if(e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if(!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } } }
+    $("#mask").addEventListener("keydown", modalKeys);
+    $("#apNo").focus();
     $("#apYes").onclick = function () { done(true); };
     $("#apNo").onclick = function () { done(false); };
   };
