@@ -37,6 +37,7 @@
     if(kind==='observe'&&p.tool==='review.judge'){review(p.obs);announce(p.obs.pass?'规则初筛通过：请阅读四句脚本与检查项，决定是否批准本地导出。':'本轮未通过：Agent 将按失败项修订；未通过前不会开放交付。');}
     if(kind==='error')announce('Agent 在 '+(p.tool||'当前步骤')+' 遇到错误并停止；查看执行轨迹中的原因，修正输入或配置后重新运行。');
     if(kind==='done'){running=false;evidence.disabled=false;checklist(p);if(p.status==='delivered'){current=plan.length;renderPlan();announce('交付已批准：TXT、SRT、CSV 与审片报告已解锁，可在下方下载。');}else if(p.status==='aborted')announce('任务已停止；交付仍锁定。检查失败步骤后可重新运行。');else if(p.verdict&&p.verdict.pass)announce('规则初筛通过；你拒绝了本次导出，文件仍锁定。确认内容后重新运行可再次审批。');else announce(p.error||'审片未通过：查看下方失败项与执行轨迹，修正 brief 后重新运行。');q('#executionPlan').appendChild(node('p','hint',p.error||'本次结束 · '+p.status+' · '+p.steps.length+' 次工具调用'));}
+    window.dispatchEvent(new CustomEvent('oneshot:agent-state',{detail:{kind:kind,payload:p}}));
     return original.call(this,kind,p);
   };
   if(window.ONESHOT_DEMO){
