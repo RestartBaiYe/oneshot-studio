@@ -39,7 +39,12 @@
         if(!ctx.verdict || !ctx.verdict.pass) throw new Error("审片未通过，禁止交付");
         if(ctx.reviewOnly) return {tool:tool.id,title:tool.title,scope:tool.scope,args:{},obs:{skipped:true,note:"批量仅审片，未授权交付"},ms:0,status:"skipped"};
         this.event("approval",{tool:tool.id});
-        var ok=await this.askApproval(tool,args);
+        var remaining=this.state.deadlineAt-performance.now();clearTimeout(this.state.deadlineTimer);
+        var approvalStarted=performance.now(),ok=await this.askApproval(tool,args);
+        if(this.state.aborted)return {tool:tool.id,title:tool.title,scope:tool.scope,args:{},obs:{skipped:true,note:"任务已停止"},ms:0,status:"denied"};
+        this.state.deadlineAt=performance.now()+Math.max(0,remaining);
+        this.state.deadlineTimer=setTimeout(function(){this.abort();}.bind(this),Math.max(0,remaining));
+        if(remaining<=0)throw new Error("任务超出执行时间预算");
         if(!ok) {ctx.deliveryApproved=false;return {tool:tool.id,title:tool.title,scope:tool.scope,args:{},obs:{skipped:true,note:"人工拒绝交付"},ms:0,status:"denied"};}
         ctx.deliveryApproved=true;
       }
@@ -54,7 +59,7 @@
       this.reset(); this.state.running=true;this.state.startedAt=performance.now();this.onEvent=opts.onEvent||null;this.lastArgs={};
       root.LLM.stats={calls:0,promptChars:0,completionChars:0,costCny:0,ms:0};
       var ctx={brief:String(brief||"").trim(),platform:opts.platform||(root.$("#platform")?root.$("#platform").value:"douyin"),round:1,bait:!!opts.bait,reviewOnly:!!opts.reviewOnly,deliveryApproved:false,first:[]};
-      var self=this, deadline=setTimeout(function(){self.state.aborted=true;root.LLM.cancel();if(self.cancelApproval)self.cancelApproval();},this.limits.maxMs), status="failed", error=null;
+      var self=this,status="failed",error=null;this.state.deadlineAt=performance.now()+this.limits.maxMs;this.state.deadlineTimer=setTimeout(function(){self.abort();},this.limits.maxMs);
       try {
         if(ctx.brief.length<8||!root.PLAT[ctx.platform])throw new Error("请输入有效商品 brief 和平台");
         var steps=await this.plan(ctx.brief);
@@ -77,7 +82,7 @@
         }
         status=ctx.verdict&&ctx.verdict.pass?(ctx.deliveryApproved?"delivered":"reviewed"):"needs_review";
       } catch(e) {error=String(e);status=this.state.aborted?(String(e).indexOf("人工拒绝交付")>=0?"reviewed":"aborted"):"failed";if(status==="reviewed")error=null;else this.event("error",{error:error});}
-      finally {clearTimeout(deadline);this.state.running=false;this.state.result={status:status,error:error,verdict:ctx.verdict||null,brief:ctx.brief,platform:ctx.platform,deliveryApproved:ctx.deliveryApproved&&!this.state.aborted&&status!=="failed",files:ctx.files||null,steps:this.state.steps,planSource:this.state.planSource,ms:Math.round(performance.now()-this.state.startedAt),llm:Object.assign({},root.LLM.stats),round:ctx.round};this.event("done",this.state.result);}
+      finally {clearTimeout(this.state.deadlineTimer);this.state.deadlineTimer=null;this.state.running=false;this.state.result={status:status,error:error,verdict:ctx.verdict||null,brief:ctx.brief,platform:ctx.platform,deliveryApproved:ctx.deliveryApproved&&!this.state.aborted&&status!=="failed",files:ctx.files||null,steps:this.state.steps,planSource:this.state.planSource,ms:Math.round(performance.now()-this.state.startedAt),llm:Object.assign({},root.LLM.stats),round:ctx.round};this.event("done",this.state.result);}
       return this.state.result;
     },
     critique: async function(step,obs,ctx) {
