@@ -17,7 +17,7 @@ window.ONESHOT_CASES = [
     "kind": "create",
     "image": "samples/commute/product.png",
     "video": "samples/commute/film.mp4",
-    "cover": "samples/commute/product.png",
+    "cover": "samples/commute/preview.jpg",
     "report": "samples/commute/report.json"
   },
   {
@@ -38,7 +38,7 @@ window.ONESHOT_CASES = [
     "kind": "create",
     "image": "samples/coffee/product.png",
     "video": "samples/coffee/film.mp4",
-    "cover": "samples/coffee/product.png",
+    "cover": "samples/coffee/preview.jpg",
     "report": "samples/coffee/report.json"
   },
   {
@@ -48,7 +48,7 @@ window.ONESHOT_CASES = [
     "description": "播放带黑场的测试短片，对照 FFmpeg 检查报告；连接本机可重新检查。",
     "kind": "review",
     "video": "samples/blackframe/film.mp4",
-    "cover": "samples/blackframe/cover.png",
+    "cover": "samples/blackframe/preview.jpg",
     "report": "samples/blackframe/report.json",
     "duration": 12
   }

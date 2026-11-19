@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-11-19T13:21:50.298Z",
+  "createdAt": "2026-11-19T13:43:19.558Z",
   "product": "咖啡豆 深烘意式拼配，454g，坚果与可可风味，售价118元，面向咖啡爱好者。",
   "platform": "douyin",
   "outputs": [
@@ -12,7 +12,7 @@
   "render": {
     "duration": 12,
     "format": "mov,mp4,m4a,3gp,3g2,mj2",
-    "size": 992258,
+    "size": 995063,
     "video": {
       "codec": "h264",
       "width": 1080,

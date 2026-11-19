@@ -213,7 +213,7 @@
   "artifacts": [
     {
       "name": "OneShot-成片.mp4",
-      "bytes": 992258
+      "bytes": 995063
     },
     {
       "name": "OneShot-字幕.srt",
@@ -221,7 +221,7 @@
     },
     {
       "name": "OneShot-封面.jpg",
-      "bytes": 91650
+      "bytes": 91872
     },
     {
       "name": "OneShot-分镜.json",
@@ -254,12 +254,12 @@
     "round": 2
   },
   "freshReview": {
-    "job": "71c3dc3f236fbe39",
-    "createdAt": "2026-11-19T13:23:33.471Z",
+    "job": "1f6bc73595657b9f",
+    "createdAt": "2026-11-19T13:44:05.006Z",
     "metadata": {
       "duration": 12,
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
-      "size": 895270,
+      "size": 882315,
       "video": {
         "codec": "h264",
         "width": 1080,
