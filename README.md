@@ -1,6 +1,6 @@
 # OneShot Studio · 电商视频运营工作台
 
-[打开案例展厅](https://restartbaiye.github.io/oneshot-studio/?demo=1) · [下载完整 Windows 包](https://restartbaiye.github.io/oneshot-studio/OneShot-Windows.zip)
+[打开案例展厅](https://restartbaiye.github.io/oneshot-studio/?demo=1) · [下载完整 Windows 包](https://restartbaiye.github.io/oneshot-studio/OneShot-Windows-20261119.zip)
 
 把商品事实组织成可审阅的四镜头脚本，人工批准后用本机 FFmpeg 制作短片；也可以检查已有视频的黑场等技术问题。**案例先展示输出，工作区单独记录本次实际运行。**
 
