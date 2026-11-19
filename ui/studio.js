@@ -60,7 +60,7 @@
   q('.preview-details').removeAttribute('open');q('.preview-details').classList.add('legacy-preview');evidenceShelf.appendChild(q('.preview-details'));
   var photoUrls=[], art=q('#scriptOutput');
   function decorate(){
-    var empty=art.querySelector('.script-empty');if(empty&&!empty.dataset.atelier){empty.dataset.atelier='true';empty.innerHTML='<div class="empty-copy"><span class="empty-kicker">YOUR NEXT PRODUCT STORY</span><strong>每一帧，<br>都从事实开始。</strong><p>写下真实卖点，Agent 将它们组织成四镜头脚本。生成后，你在这里逐句审阅。</p><span class="empty-step">01 输入商品事实 <i>→</i> 02 生成分镜</span></div><div class="frame-art" aria-hidden="true"><div class="ghost-frame frame-back"><span>03</span></div><div class="ghost-frame frame-mid"><span>02</span></div><div class="ghost-frame frame-front"><span>01 / OPENING</span><div class="frame-cross">＋</div><small>WAITING FOR YOUR STORY</small></div></div>';}
+    var empty=art.querySelector('.script-empty');if(empty&&!empty.dataset.atelier){empty.dataset.atelier='true';empty.innerHTML='<div class="empty-copy"><span class="empty-kicker">THE ART OF YOUR NEXT STORY</span><strong>好故事，<br>从<span class="story-em">真实</span>开始。</strong><p>写下真实卖点，Agent 将它们组织成四镜头脚本。生成后，你在这里逐句审阅。</p><span class="empty-step">01 输入商品事实 <i>→</i> 02 生成分镜</span></div><div class="reel-art" aria-hidden="true"><div class="reel-orbit"></div><div class="reel-outline"></div><div class="reel-film"><span class="reel-label">ONESHOT / CONTACT SHEET</span><div class="reel-frame"><span class="reel-index">01</span><i class="reel-aperture"></i><span class="reel-take">YOUR STORY<br>STARTS HERE.</span></div><div class="reel-track"><span>02</span><span>03</span><span>04</span></div><span class="reel-caption">FOUR SHOTS. ONE STORY.</span></div></div>';}
     art.querySelectorAll('.script-line').forEach(function(line,i){if(!line.classList.contains('story-shot')&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&line.animate)line.animate([{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:260,delay:i*45,easing:'ease-out'});line.classList.add('story-shot');line.setAttribute('aria-label','镜头 '+(i+1));var old=line.querySelector('.shot-image');if(old)old.remove();if(photoUrls.length){var img=node('img','shot-image');img.alt='你选择的商品图片 '+((i%photoUrls.length)+1);img.src=photoUrls[i%photoUrls.length];line.prepend(img);}});
   }
   new MutationObserver(function(records){if(records.some(function(r){return r.target===art;}))decorate();}).observe(art,{childList:true});decorate();
@@ -75,5 +75,15 @@
 
   var media=matchMedia('(prefers-reduced-motion: reduce)');
   if(!media.matches&&Element.prototype.animate){document.querySelectorAll('.workspace-intro,.flow,.desk>.col,.script-card').forEach(function(el,i){el.animate([{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],{duration:400,delay:i*65,easing:'ease-out'});});}
-  document.querySelectorAll('.script-card').forEach(function(card){card.addEventListener('pointermove',function(e){if(media.matches||e.pointerType==='touch')return;var rect=card.getBoundingClientRect();card.style.setProperty('--spot-x',(e.clientX-rect.left)+'px');card.style.setProperty('--spot-y',(e.clientY-rect.top)+'px');});});
+  document.querySelectorAll('.script-card').forEach(function(card){
+    var frame=0,point=null;
+    card.addEventListener('pointermove',function(e){
+      if(media.matches||e.pointerType==='touch')return;
+      point={x:e.clientX,y:e.clientY};
+      if(frame)return;
+      frame=requestAnimationFrame(function(){var rect=card.getBoundingClientRect();card.style.setProperty('--spot-x',(point.x-rect.left)+'px');card.style.setProperty('--spot-y',(point.y-rect.top)+'px');frame=0;});
+    });
+    card.addEventListener('pointerleave',function(){if(frame)cancelAnimationFrame(frame);frame=0;card.style.removeProperty('--spot-x');card.style.removeProperty('--spot-y');});
+    media.addEventListener('change',function(){if(frame)cancelAnimationFrame(frame);frame=0;card.style.removeProperty('--spot-x');card.style.removeProperty('--spot-y');});
+  });
 })();
