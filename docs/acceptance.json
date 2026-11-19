@@ -76,61 +76,61 @@
       "surface": "materials",
       "theme": "light",
       "width": 1280,
-      "contrast": 14.422697136259155,
+      "contrast": 13.386029083415691,
       "overflow": 0,
-      "fg": "rgb(32, 35, 41)",
-      "bg": "rgb(245, 245, 243)",
-      "briefY": 383.109375
+      "fg": "rgb(35, 41, 35)",
+      "bg": "rgb(244, 243, 239)",
+      "briefY": 392.453125
     },
     {
       "surface": "materials",
       "theme": "light",
       "width": 1024,
-      "contrast": 14.422697136259155,
+      "contrast": 13.386029083415691,
       "overflow": 0,
-      "fg": "rgb(32, 35, 41)",
-      "bg": "rgb(245, 245, 243)",
-      "briefY": 372.109375
+      "fg": "rgb(35, 41, 35)",
+      "bg": "rgb(244, 243, 239)",
+      "briefY": 389.453125
     },
     {
       "surface": "materials",
       "theme": "light",
       "width": 850,
-      "contrast": 14.422697136259155,
+      "contrast": 13.386029083415691,
       "overflow": 0,
-      "fg": "rgb(32, 35, 41)",
-      "bg": "rgb(245, 245, 243)",
-      "briefY": 372.109375
+      "fg": "rgb(35, 41, 35)",
+      "bg": "rgb(244, 243, 239)",
+      "briefY": 389.453125
     },
     {
       "surface": "materials",
       "theme": "light",
       "width": 768,
-      "contrast": 14.422697136259155,
+      "contrast": 13.386029083415691,
       "overflow": 0,
-      "fg": "rgb(32, 35, 41)",
-      "bg": "rgb(245, 245, 243)",
-      "briefY": 372.109375
+      "fg": "rgb(35, 41, 35)",
+      "bg": "rgb(244, 243, 239)",
+      "briefY": 389.453125
     },
     {
       "surface": "materials",
       "theme": "light",
       "width": 390,
-      "contrast": 14.422697136259155,
+      "contrast": 13.386029083415691,
       "overflow": 0,
-      "fg": "rgb(32, 35, 41)",
-      "bg": "rgb(245, 245, 243)",
-      "briefY": 478.078125
+      "fg": "rgb(35, 41, 35)",
+      "bg": "rgb(244, 243, 239)",
+      "briefY": 515.4375
     },
     {
       "surface": "materials",
       "theme": "light",
       "width": 320,
-      "contrast": 14.422697136259155,
+      "contrast": 13.386029083415691,
       "overflow": 0,
-      "fg": "rgb(32, 35, 41)",
-      "bg": "rgb(245, 245, 243)",
-      "briefY": 478.078125
+      "fg": "rgb(35, 41, 35)",
+      "bg": "rgb(244, 243, 239)",
+      "briefY": 515.4375
     },
     {
       "surface": "materials",
@@ -140,7 +140,7 @@
       "overflow": 0,
       "fg": "rgb(240, 241, 245)",
       "bg": "rgb(28, 31, 38)",
-      "briefY": 383.109375
+      "briefY": 392.453125
     },
     {
       "surface": "materials",
@@ -150,7 +150,7 @@
       "overflow": 0,
       "fg": "rgb(240, 241, 245)",
       "bg": "rgb(28, 31, 38)",
-      "briefY": 372.109375
+      "briefY": 389.453125
     },
     {
       "surface": "materials",
@@ -160,7 +160,7 @@
       "overflow": 0,
       "fg": "rgb(240, 241, 245)",
       "bg": "rgb(28, 31, 38)",
-      "briefY": 372.109375
+      "briefY": 389.453125
     },
     {
       "surface": "materials",
@@ -170,7 +170,7 @@
       "overflow": 0,
       "fg": "rgb(240, 241, 245)",
       "bg": "rgb(28, 31, 38)",
-      "briefY": 372.109375
+      "briefY": 389.453125
     },
     {
       "surface": "materials",
@@ -180,7 +180,7 @@
       "overflow": 0,
       "fg": "rgb(240, 241, 245)",
       "bg": "rgb(28, 31, 38)",
-      "briefY": 478.078125
+      "briefY": 515.4375
     },
     {
       "surface": "materials",
@@ -190,7 +190,7 @@
       "overflow": 0,
       "fg": "rgb(240, 241, 245)",
       "bg": "rgb(28, 31, 38)",
-      "briefY": 478.078125
+      "briefY": 515.4375
     }
   ],
   "previews": [
@@ -213,7 +213,7 @@
   "artifacts": [
     {
       "name": "OneShot-成片.mp4",
-      "bytes": 312497
+      "bytes": 992258
     },
     {
       "name": "OneShot-字幕.srt",
@@ -221,15 +221,15 @@
     },
     {
       "name": "OneShot-封面.jpg",
-      "bytes": 85731
+      "bytes": 91650
     },
     {
       "name": "OneShot-分镜.json",
-      "bytes": 661
+      "bytes": 1033
     },
     {
       "name": "制作报告.json",
-      "bytes": 882
+      "bytes": 975
     }
   ],
   "errors": [],
@@ -254,11 +254,12 @@
     "round": 2
   },
   "freshReview": {
-    "createdAt": "2026-11-19T12:07:52.146Z",
+    "job": "71c3dc3f236fbe39",
+    "createdAt": "2026-11-19T13:23:33.471Z",
     "metadata": {
       "duration": 12,
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
-      "size": 200580,
+      "size": 895270,
       "video": {
         "codec": "h264",
         "width": 1080,

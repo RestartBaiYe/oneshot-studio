@@ -2,7 +2,7 @@
 
 ## 运行分层
 
-浏览器：index.html → core/engine.js（既有规则与分镜）→ llm.js（可选模型适配）→ tools.js（本地工具注册/验证）→ agent.js（有限工作流）→ ui/shell.js、studio.js、media.js、gallery.js（视图、证据、媒体、案例）。以浏览器原生 API 为主，无前端框架或服务端 npm 运行依赖。Playwright 仅为开发测试依赖。
+浏览器：index.html → core/engine.js（既有规则与分镜）→ llm.js（可选模型适配）→ tools.js（本地工具注册/验证）→ agent.js（有限工作流）→ ui/shell.js、studio.js、media.js、gallery.js、motion.js（视图、证据、媒体、案例）。以浏览器原生 API 为主，无前端框架或服务端 npm 运行依赖。Playwright 仅为开发测试依赖。
 
 本机：media-service/server.cjs 使用 Node HTTP、shell:false 子进程和 FFmpeg/FFprobe，绑定 127.0.0.1。公共 Pages 只提供静态文件；模型请求不经 OneShot 后端。
 
@@ -30,6 +30,12 @@
 | GET /api/files/:job/:name | 读取该任务允许的输出文件 |
 
 服务有 Host/Origin、路径、大小和超时限制。单图12MB、至多8图；视频500MB、15分钟。JSON/Base64 有额外内存开销。API 是单机编码器，不提供用户认证或平台发布；勿暴露公网。上传原视频分析后清理，输出保留 deliveries/。静态路由仅允许网页资源和限定 samples 路径，不能读取服务源码。
+
+## 媒体合成与动效
+
+media-service/compositor.cjs 独立处理四镜头时间轴：每镜头按总时长四等分，源片两端预留转场重叠，三次 xfade 不缩短成片。8秒时转场0.4秒，12–30秒时转场0.5秒。zoompan 按余弦缓动推进/横移，1080×1920、24fps；渐变阅读底色、68/52px字幕、长行折行、短入场和四段进度线。文字用 UTF-8 textfile 与 expansion=none，不解释为滤镜表达式。报告记录 editorial-motion-v1、转场数与逐镜运动。
+
+motion.js 管理自己的 Web Animations 与展厅视频：关键图片和字体就绪后允许播放；非展厅、离屏、页面隐藏、打开样例弹窗、节流模式或减少动效时暂停。系统偏好变化会取消所属动画。预置视频始终不发 oneshot:media-ready。
 
 ## 已知限制
 

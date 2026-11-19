@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "results": [
+    {
+      "duration": 8,
+      "frames": 192,
+      "bytes": 402346,
+      "audio": false
+    },
+    {
+      "duration": 30,
+      "frames": 720,
+      "bytes": 259495,
+      "audio": false
+    }
+  ],
+  "literalText": true,
+  "oversizeTextRejected": true
+}

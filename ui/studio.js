@@ -69,7 +69,7 @@
   function resetVisible(){if(Agent.state.running)return;q('#visibleTools').textContent='0';q('#visibleReviews').textContent='0';q('#visibleApproval').textContent='等待重新生成';q('#runOrigin').textContent='输入已更新';}
   q('#brief').addEventListener('input',resetVisible);q('#platform').addEventListener('change',resetVisible);q('#btnClear').addEventListener('click',resetVisible);q('#chips').addEventListener('click',resetVisible);
   window.addEventListener('oneshot:agent-state',function(e){requestAnimationFrame(function(){q('#visibleTools').textContent=Agent.state.steps.length;q('#visibleReviews').textContent=history.length;q('#runOrigin').textContent=LLM.active==='offline'?'离线规则 · 无模型调用':'模型辅助 · '+LLM.cfg.model;var kind=e.detail.kind;q('#visibleApproval').textContent=kind==='approval'?'等待人工批准':kind==='done'?(e.detail.payload.deliveryApproved?'人工批准 ✓':'交付未开放'):Agent.state.running?'正在执行工具':'待命';});});
-  var videoPanel=node('section','film-player');videoPanel.hidden=true;videoPanel.innerHTML='<header><span class="stage-caption">FINAL CUT</span><b>本次真实成片</b><span id="filmSpec"></span></header><video id="finalFilm" controls playsinline preload="metadata"></video><p>本机制作 · 商品图与字幕 · 无音轨</p>';q('.media-columns').before(videoPanel);
+  var videoPanel=node('section','film-player');videoPanel.hidden=true;videoPanel.innerHTML='<header><span class="stage-caption">FINAL CUT</span><b>本次真实成片</b><span id="filmSpec"></span></header><video id="finalFilm" controls playsinline preload="metadata"></video><p>本机制作 · 镜头运动 / 分层字幕 / 转场 · 无音轨</p>';q('.media-columns').before(videoPanel);
   window.addEventListener('oneshot:media-ready',function(e){var d=e.detail,mp4=d.manifest.files.find(function(f){return f.name.endsWith('.mp4');});if(!mp4)return;q('#finalFilm').src=d.api+mp4.url.slice(4);q('#filmSpec').textContent=d.manifest.render.duration.toFixed(0)+' SEC / 1080 × 1920';videoPanel.hidden=false;});
   window.addEventListener('oneshot:media-invalidated',function(){q('#finalFilm').pause();q('#finalFilm').removeAttribute('src');q('#finalFilm').load();videoPanel.hidden=true;});
 
@@ -82,7 +82,7 @@
       if(media.matches||e.pointerType==='touch')return;
       point={x:e.clientX,y:e.clientY};
       if(frame)return;
-      frame=requestAnimationFrame(function(){var rect=card.getBoundingClientRect();card.style.setProperty('--spot-x',(point.x-rect.left)+'px');card.style.setProperty('--spot-y',(point.y-rect.top)+'px');frame=0;});
+      frame=requestAnimationFrame(function(){if(media.matches){frame=0;return;}var rect=card.getBoundingClientRect();card.style.setProperty('--spot-x',(point.x-rect.left)+'px');card.style.setProperty('--spot-y',(point.y-rect.top)+'px');frame=0;});
     });
     card.addEventListener('pointerleave',function(){if(frame)cancelAnimationFrame(frame);frame=0;card.style.removeProperty('--spot-x');card.style.removeProperty('--spot-y');});
     media.addEventListener('change',function(){if(frame)cancelAnimationFrame(frame);frame=0;card.style.removeProperty('--spot-x');card.style.removeProperty('--spot-y');});

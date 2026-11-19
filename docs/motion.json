@@ -1,0 +1,38 @@
+{
+  "videos": [
+    {
+      "id": "commute",
+      "frames": 288,
+      "duplicates": 0,
+      "mean": 0.312345806716996,
+      "p95": 0.6997222222222222,
+      "peak": 1.1996006944444444
+    },
+    {
+      "id": "coffee",
+      "frames": 288,
+      "duplicates": 0,
+      "mean": 0.36713789682539666,
+      "p95": 0.78203125,
+      "peak": 1.4035590277777779
+    }
+  ],
+  "browser": {
+    "raf": {
+      "samples": 120,
+      "median": 3.300000000000068,
+      "p95": 3.5,
+      "max": 30
+    },
+    "checks": [
+      "actual preview playback",
+      "manual pause/resume",
+      "offscreen task pauses video",
+      "four-stage indicator",
+      "dynamic reduced-motion pause",
+      "modal avoids duplicate playback",
+      "preset remains isolated"
+    ],
+    "errors": []
+  }
+}
