@@ -10,16 +10,16 @@
 <link rel="stylesheet" href="assets/screening.css?v=screen1">
 <link rel="stylesheet" href="assets/slate.css?v=slate1">
 <link rel="stylesheet" href="assets/contest.css?v=contest1">
-<link rel="stylesheet" href="assets/integrated.css?v=shots2">
+<link rel="stylesheet" href="assets/integrated.css?v=routes3">
 </head>
 <body>
 <div id="app">
   <aside class="rail">
     <div class="brand"><div class="mark"></div><div><b>OneShot</b><span>STUDIO · AGENT</span></div></div>
     <nav class="nav" id="nav">
-      <button data-pane="gallery" class="on"><span class="ic">◫</span>案例展厅</button><button data-pane="desk"><span class="ic">＋</span>当前任务</button>
+      <button data-pane="gallery" class="on"><span class="ic">◫</span>案例展厅</button><button data-pane="current"><span class="ic">◉</span>当前任务</button>
       <button data-pane="ai-source"><span class="ic">▷</span>商品图 AI 制片</button><button data-pane="settings"><span class="ic">⚙</span>模型配置</button><span id="navReview" hidden>—</span>
-      <details class="nav-more"><summary>工作区与设置</summary>
+      <details class="nav-more demo-tools"><summary>案例演示工具</summary><button data-pane="demo-settings">示例模型与工具</button>
         <button data-pane="batch"><span class="ic">≡</span>批量任务</button>
         <button data-pane="memory"><span class="ic">◈</span>记忆库<span class="badge" id="navMem">0</span></button>
         <button data-pane="trace"><span class="ic">⇄</span>执行记录</button>
@@ -29,7 +29,7 @@
     <div class="sp"></div>
     <div class="railfoot">
       <span class="pill" id="railProvider"><span class="dot"></span><span id="railProviderTxt">离线确定性策略</span></span>
-      <span>LOCAL FIRST · 内容工作流</span>
+      <span class="pill formal-provider" id="formalProvider">商业广告工作台</span><span>LOCAL FIRST · 内容工作流</span>
       <a href="README.md" style="color:#9C9287;font-size:11px;text-decoration:none">使用说明 →</a>
     </div>
   </aside>
@@ -50,8 +50,12 @@
     <main>
 <section class="pane on" id="pane-gallery" aria-label="案例展厅"></section>
 <div class="project-chrome" id="projectChrome"><div class="project-heading"><button class="btn ghost sm" id="backGallery">← 案例展厅</button><div><span class="eyebrow">CURRENT PROJECT / 本次任务</span><h2 id="projectTitle">新建短片</h2></div><span id="taskMode" class="mode-label">离线规则 · 无模型调用</span></div><div class="slate-rule"><span>PRODUCTION SLATE <i>/</i> 本次任务</span><small>下划线为浏览位置 · 状态来自本次运行</small></div><nav class="work-steps" aria-label="四步工作台"><button data-workstep="materials" data-go="desk">01 <b>素材准备</b><small>商品事实与图片</small></button><button data-workstep="script" data-go="script">02 <b>生成脚本</b><small>四句逐镜文案</small></button><button data-workstep="review" data-go="review">03 <b>审查批准</b><small>检查依据再决定</small></button><button data-workstep="delivery" data-go="media">04 <b>视频验证与交付</b><small>制作新片或检查旧片</small></button></nav><div class="slate-next"><div class="slate-lead"><span class="slate-cue" aria-hidden="true">↳</span><p id="projectNotice" role="status"></p></div><button class="btn" id="slateNext" type="button">填写商品事实 →</button></div></div>
-      <!-- 作业台 -->
-      <section class="pane" id="pane-desk"><section class="ai-section card" id="ai-source"><span class="eyebrow">AI PRODUCTION / 01</span><h2>从商品原图开始</h2><div class="ai-columns"><div><label>商品图片（PNG/JPEG，最多 8 MB）<input id="aiImage" type="file" accept="image/png,image/jpeg"></label><img id="aiPreview" hidden alt="本次商品原图"><label>商品介绍<textarea id="aiBrief" maxlength="3000" placeholder="例如：商品名称、目标顾客、一个能核实的购买理由、希望顾客下一步做什么。没有的价格或优惠不要补写。"></textarea></label><div class="rowbtns"><button type="button" class="btn" id="aiAnalyze">根据原图和介绍生成分镜</button><button type="button" class="btn" id="aiBlank">新建另一项任务</button></div></div><aside><h3>模型分工</h3><p id="aiConfigSummary"></p><button type="button" class="btn" id="aiSettings">配置两个模型 →</button><p>第一步仅调用识图模型；你批准四镜后，仍由你分别确认每个视频任务。历史样片与当前任务隔离。</p><div id="aiLocalHelp" hidden><a href="OneShot-Windows.zip">下载 Windows 运行包</a> · <a href="http://127.0.0.1:41739/">打开本机工作台</a></div></aside></div></section><section class="ai-section card" id="ai-script"><span class="eyebrow">AI PRODUCTION / 02</span><h2>商品广告 · 四镜预览与逐镜编辑</h2><p id="aiObservations"></p><p class="shot-help">四镜分别负责亮相、购买理由、细节佐证、行动引导。下图是商品原图参考，不是模型生成帧。手改可点「保存本镜修改」；AI 候选需由你采用，单镜修改不会重写其他镜头。</p><button type="button" class="btn ghost sm" id="aiRewriteAll">重新策划整组四镜</button><div class="ai-columns" id="aiShots"></div><div class="rowbtns"><button type="button" class="btn" id="aiCheck">核对本次分镜 →</button><button type="button" class="btn" id="aiExport">导出提示词与剧本 JSON</button></div></section>
+<section class="pane ai-page" id="pane-ai-source" aria-label="商品素材"><section class="ai-section card" id="ai-source"><span class="eyebrow">AI PRODUCTION / 01</span><h2>从商品原图开始</h2><div class="ai-columns"><div><label>商品图片（PNG/JPEG，最多 8 MB）<input id="aiImage" type="file" accept="image/png,image/jpeg"></label><img id="aiPreview" hidden alt="本次商品原图"><label>商品介绍<textarea id="aiBrief" maxlength="3000" placeholder="例如：商品名称、目标顾客、一个能核实的购买理由、希望顾客下一步做什么。没有的价格或优惠不要补写。"></textarea></label><div class="rowbtns"><button type="button" class="btn" id="aiAnalyze">根据原图和介绍生成分镜</button><button type="button" class="btn" id="aiBlank">新建另一项任务</button></div></div><aside><h3>模型分工</h3><p id="aiConfigSummary"></p><button type="button" class="btn" id="aiSettings">配置两个模型 →</button><p>第一步仅调用识图模型；你批准四镜后，仍由你分别确认每个视频任务。历史样片与当前任务隔离。</p><div id="aiLocalHelp" hidden><a href="OneShot-Windows.zip">下载 Windows 运行包</a> · <a href="http://127.0.0.1:41739/">打开本机工作台</a></div></aside></div></section></section>
+<section class="pane ai-page" id="pane-ai-script" aria-label="图文分镜"><section class="ai-section card" id="ai-script"><span class="eyebrow">AI PRODUCTION / 02</span><h2>商品广告 · 四镜预览与逐镜编辑</h2><p id="aiObservations"></p><p class="shot-help">四镜分别负责亮相、购买理由、细节佐证、行动引导。下图是商品原图参考，不是模型生成帧。手改可点「保存本镜修改」；AI 候选需由你采用，单镜修改不会重写其他镜头。</p><button type="button" class="btn ghost sm" id="aiRewriteAll">重新策划整组四镜</button><div class="ai-columns" id="aiShots"></div><div class="rowbtns"><button type="button" class="btn" id="aiCheck">核对本次分镜 →</button><button type="button" class="btn" id="aiExport">导出提示词与剧本 JSON</button></div></section></section>
+<section class="pane ai-page" id="pane-ai-check" aria-label="审查批准"><section class="ai-section card" id="ai-check"><span class="eyebrow">AI PRODUCTION / 03</span><h2>审查这张原图对应的生成指令</h2><p>原始商品介绍是文字依据；可见特征是模型观察，不是材质或功效的证明。以下四条提示词将分别发送给视频模型。</p><blockquote id="aiEvidence"></blockquote><div id="aiChecks"></div><div class="rowbtns"><button type="button" class="btn" id="aiApprove">批准四镜 · 暂不生成视频</button><button type="button" class="btn" id="aiEdit">返回修改分镜</button></div></section></section>
+<section class="pane ai-page" id="pane-ai-film" aria-label="视频交付"><section class="ai-section card" id="ai-film"><span class="eyebrow">AI PRODUCTION / 04</span><h2>逐镜生成与交付</h2><p>每次确认只发送一镜；请求中的提示词取自已批准分镜，并带原始商品图。查询不会重复创建，四镜实际就绪后才能剪接。</p><div id="aiJobs" class="ai-columns"></div><div class="rowbtns"><button type="button" class="btn" id="aiUpdate">刷新本机记录</button><button type="button" class="btn" id="aiMerge">剪接四镜并导出</button></div><div id="aiFiles"></div></section></section>
+      <!-- 展厅案例专用作业区 -->
+      <section class="pane" id="pane-desk">
         <div class="workspace-intro"><div><span class="eyebrow">ONESHOT STUDIO / 电商内容创作</span><h2><span>把商品信息，</span><span class="headline-finish">变成下一支短片<span class="title-dot">。</span></span></h2><p>为电商运营准备：写脚本、查风险、交付可下载的短片。</p></div><div class="intro-actions"><button class="btn ghost sm" id="goExistingVideo">检查已有视频 ↗</button><button class="btn ghost sm" id="showcase">演示视图</button></div></div>
 <div class="flow" aria-label="四步任务流程"><span data-phase="0" class="active">01 素材准备</span><span data-phase="1">02 脚本</span><span data-phase="2">03 审查</span><span data-phase="3">04 视频验证与交付</span></div><p id="nextAction" role="status" aria-live="polite">填写商品事实，可选添加商品图片，然后运行 Agent 生成本次脚本。</p><div class="desk">
           <div class="col scroll">
@@ -129,7 +133,7 @@
       </section>
 
       <!-- 审片台 -->
-      <section class="pane" id="pane-review"><section class="ai-section card" id="ai-check"><span class="eyebrow">AI PRODUCTION / 03</span><h2>审查这张原图对应的生成指令</h2><p>原始商品介绍是文字依据；可见特征是模型观察，不是材质或功效的证明。以下四条提示词将分别发送给视频模型。</p><blockquote id="aiEvidence"></blockquote><div id="aiChecks"></div><div class="rowbtns"><button type="button" class="btn" id="aiApprove">批准四镜 · 暂不生成视频</button><button type="button" class="btn" id="aiEdit">返回修改分镜</button></div></section>
+      <section class="pane" id="pane-review">
         <div class="delivery-stage"><div class="step-heading"><span>03 / 审查脚本与批准</span><h2>审查脚本依据，再进入视频验证</h2><p>阅读四句脚本、事实表和规则检查项。通过后由你批准本次交付，再选择制作新视频或检查已有视频。</p><button class="btn" id="goVideoWorkshop">下一步：视频验证与交付 →</button></div><div class="gridwrap">
           <div class="card">
             <h3>审片结论</h3>
@@ -145,7 +149,7 @@
         </div><div id="reviewEvidence"></div></div>
       </section>
 
-      <section class="pane" id="pane-media"><section class="ai-section card" id="ai-film"><span class="eyebrow">AI PRODUCTION / 04</span><h2>逐镜生成与交付</h2><p>每次确认只发送一镜；请求中的提示词取自已批准分镜，并带原始商品图。查询不会重复创建，四镜实际就绪后才能剪接。</p><div id="aiJobs" class="ai-columns"></div><div class="rowbtns"><button type="button" class="btn" id="aiUpdate">刷新本机记录</button><button type="button" class="btn" id="aiMerge">剪接四镜并导出</button></div><div id="aiFiles"></div></section><div class="delivery-stage"><div class="step-heading"><span>04 / 视频验证与交付</span><button class="btn ghost sm" id="backToReview">← 返回审查批准</button><h2>验证视频，再领取交付文件</h2><p>新视频请进入商品图 AI 制片，核对图文模型生成的分镜。已有视频走独立技术检查。每个结果都显示状态、失败原因和可重试动作。</p></div><div class="media-intro"><p>AI 制片通过已配置的视频模型生成镜头；也可把现有视频交给同一服务做技术检查。视频不上传到 OneShot 云端，不自动发布。</p><div class="local-service"><span id="mediaServiceDot" class="service-dot"></span><b id="mediaServiceState">正在检查本机制作服务…</b><button class="btn ghost sm" id="mediaServiceCheck">重新连接</button><a href="media-service/README.md" target="_blank" rel="noreferrer">安装与启动说明 ↗</a></div></div><div class="media-columns"><article class="card"><span class="media-step">01 / MAKE A VIDEO</span><h3>商品图 + 四句脚本 → MP4</h3><p>先在「创作工作台」完成脚本审阅与人工批准，再选择商品图。本机按四句脚本制作四段带镜头运动、字幕和转场的画面。</p><label class="f" for="productImages">商品图（最多 8 张，PNG / JPEG / WebP，每张 ≤12 MB）</label><input id="productImages" type="file" multiple accept="image/png,image/jpeg,image/webp"><div class="video-fields"><label class="f">成片时长<select id="videoDuration"><option value="16">16 秒</option><option value="12">12 秒</option><option value="20">20 秒</option><option value="30">30 秒</option></select></label><label class="f">画面比例<select id="videoRatio"><option value="9:16">竖屏 9:16（1080×1920）</option></select></label></div><div class="media-note">AI 视频路径导出模型镜头剪接成片、SRT 与分镜 JSON。离线规则示例只交付脚本。</div><button class="btn" id="makeVideo" disabled>连接服务后制作 MP4</button><div id="renderFiles" class="render-files" aria-live="polite"></div></article><article class="card"><span class="media-step">02 / REVIEW EXISTING VIDEO</span><h3>现有成片技术检查</h3><p>FFmpeg / FFprobe 检查视频元数据、黑场区段和显著镜头变化阈值，并生成可下载的技术报告。</p><label class="f" for="reviewVideo">上传视频（≤500 MB、最长 15 分钟）</label><input id="reviewVideo" type="file" accept="video/*"><div id="videoMeta" class="media-note">视频通过 localhost 发给本机服务分析，不会上传到 OneShot 服务器。</div><button class="btn" id="runVideoReview" disabled>开始技术审查</button><div id="videoAnalysis" class="video-analysis" aria-live="polite"><p>等待选择文件；这里不判断剧情、广告法、商品真伪或画面审美。</p></div><button class="btn ghost" id="downloadVideoReport" disabled>下载 JSON 审查报告</button></article></div><p id="mediaStatus" class="media-status" role="status" aria-live="polite">检查本机服务后开始。脚本和商品图只发往 127.0.0.1。</p><div id="mediaRunState" class="media-run-state" role="status" aria-live="polite">尚未开始媒体任务。</div><button id="mediaRetry" class="btn ghost sm media-retry" type="button" disabled>重新执行上一次操作</button><p class="media-boundary">视频编码与像素指标在本机完成；已配置模型只参与作业台文案，不分析视频帧。独立视频检查不调用生成模型，不做语义或法律审查，不发布。</p></div></section>
+      <section class="pane" id="pane-media"><div class="delivery-stage"><div class="step-heading"><span>04 / 视频验证与交付</span><button class="btn ghost sm" id="backToReview">← 返回审查批准</button><h2>验证视频，再领取交付文件</h2><p>新视频请进入商品图 AI 制片，核对图文模型生成的分镜。已有视频走独立技术检查。每个结果都显示状态、失败原因和可重试动作。</p></div><div class="media-intro"><p>AI 制片通过已配置的视频模型生成镜头；也可把现有视频交给同一服务做技术检查。视频不上传到 OneShot 云端，不自动发布。</p><div class="local-service"><span id="mediaServiceDot" class="service-dot"></span><b id="mediaServiceState">正在检查本机制作服务…</b><button class="btn ghost sm" id="mediaServiceCheck">重新连接</button><a href="media-service/README.md" target="_blank" rel="noreferrer">安装与启动说明 ↗</a></div></div><div class="media-columns"><article class="card"><span class="media-step">01 / MAKE A VIDEO</span><h3>商品图 + 四句脚本 → MP4</h3><p>先在「创作工作台」完成脚本审阅与人工批准，再选择商品图。本机按四句脚本制作四段带镜头运动、字幕和转场的画面。</p><label class="f" for="productImages">商品图（最多 8 张，PNG / JPEG / WebP，每张 ≤12 MB）</label><input id="productImages" type="file" multiple accept="image/png,image/jpeg,image/webp"><div class="video-fields"><label class="f">成片时长<select id="videoDuration"><option value="16">16 秒</option><option value="12">12 秒</option><option value="20">20 秒</option><option value="30">30 秒</option></select></label><label class="f">画面比例<select id="videoRatio"><option value="9:16">竖屏 9:16（1080×1920）</option></select></label></div><div class="media-note">AI 视频路径导出模型镜头剪接成片、SRT 与分镜 JSON。离线规则示例只交付脚本。</div><button class="btn" id="makeVideo" disabled>连接服务后制作 MP4</button><div id="renderFiles" class="render-files" aria-live="polite"></div></article><article class="card"><span class="media-step">02 / REVIEW EXISTING VIDEO</span><h3>现有成片技术检查</h3><p>FFmpeg / FFprobe 检查视频元数据、黑场区段和显著镜头变化阈值，并生成可下载的技术报告。</p><label class="f" for="reviewVideo">上传视频（≤500 MB、最长 15 分钟）</label><input id="reviewVideo" type="file" accept="video/*"><div id="videoMeta" class="media-note">视频通过 localhost 发给本机服务分析，不会上传到 OneShot 服务器。</div><button class="btn" id="runVideoReview" disabled>开始技术审查</button><div id="videoAnalysis" class="video-analysis" aria-live="polite"><p>等待选择文件；这里不判断剧情、广告法、商品真伪或画面审美。</p></div><button class="btn ghost" id="downloadVideoReport" disabled>下载 JSON 审查报告</button></article></div><p id="mediaStatus" class="media-status" role="status" aria-live="polite">检查本机服务后开始。脚本和商品图只发往 127.0.0.1。</p><div id="mediaRunState" class="media-run-state" role="status" aria-live="polite">尚未开始媒体任务。</div><button id="mediaRetry" class="btn ghost sm media-retry" type="button" disabled>重新执行上一次操作</button><p class="media-boundary">视频编码与像素指标在本机完成；已配置模型只参与作业台文案，不分析视频帧。独立视频检查不调用生成模型，不做语义或法律审查，不发布。</p></div></section>
 
       <!-- 批处理 -->
       <section class="pane" id="pane-batch">
@@ -194,7 +198,8 @@
       <!-- 设置 -->
       <section class="pane" id="pane-settings"><section class="card ai-config" aria-labelledby="dualTitle"><span class="eyebrow">MODEL DESK / 双模型接入</span><h2 id="dualTitle">给两个岗位各选一个模型</h2><p>图文模型读原图、写剧本和镜头提示词；视频模型用同一张原图和获批提示词生成画面。保存配置不调用模型。</p>
 <form id="modelForm" autocomplete="off"><div class="ai-columns"><fieldset><legend>01　文字／识图模型</legend><label>OpenAI 兼容 Base URL<input id="visionBase" type="url" required placeholder="https://api.openai.com/v1"></label><label>支持图片输入的模型 ID<input id="visionId" maxlength="180" placeholder="视觉模型名或方舟 ep-…"></label><label>识图服务 API Key<input id="visionSecret" type="password" autocomplete="new-password" placeholder="未设置；请在本机填写"></label><p>图片和介绍只发送到这里。填写 API 根地址；纯文字模型不支持读图。</p></fieldset><fieldset><legend>02　视频生成模型</legend><p>火山方舟北京 · Seedance 图生视频</p><label>视频模型／推理接入点 ID<input id="videoId" maxlength="180" placeholder="ep-…"></label><label>方舟视频 API Key<input id="videoSecret" type="password" autocomplete="new-password" placeholder="未设置；请在本机填写"></label><label class="ai-check"><input id="shareKey" type="checkbox" aria-describedby="shareKeyHint" disabled>两栏都是方舟，明确共用文字栏 Key</label><p id="shareKeyHint" aria-live="polite">默认使用独立 Key。仅方舟北京官方文字端点可选择共用。</p></fieldset></div><p id="modelStatus" role="status"></p><div class="rowbtns"><button class="btn" id="saveModels" type="submit">保存本机配置</button><button class="btn ghost" type="button" id="forgetKeys">清除服务内存中的 Key</button><button class="btn ghost" type="button" id="returnAI">返回 AI 制片 →</button></div></form><p class="sec-note">密钥不回显、不写浏览器存储；端点与模型 ID 保存在本机，重启后需重填 Key 或用环境变量。DSH 插件密钥不会自动导入。</p></section>
-        <div class="gridwrap">
+        </section>
+<section class="pane" id="pane-demo-settings" aria-label="案例演示设置"><div class="gridwrap">
           <div class="card">
             <h3>旧版文字示例（不用于商品图 AI 制片）<span class="n" id="setCur">offline</span></h3>
             <p class="sec-note">显式选择离线时，工作流用<b>本地确定性规划器</b>跑完整的 plan→act→observe→repair 循环（同一输入可复现）。填入任意 OpenAI 兼容端点或本机 Ollama，规划、起草与改写交给模型，循环结构不变。</p>
@@ -247,13 +252,13 @@
 <script src="core/tools.js?v=contest1"></script>
 <script src="core/planner.js?v=contest1"></script>
 <script src="core/agent.js?v=contest1"></script>
-<script src="ui/shell.js?v=dual1"></script>
+<script src="ui/shell.js?v=routes3"></script>
 <script src="ui/studio.js?v=contest1"></script>
 <script src="ui/media.js?v=dual1"></script>
 <script src="samples/catalog.js?v=motion4"></script>
-<script src="ui/gallery.js?v=dual1"></script>
+<script src="ui/gallery.js?v=routes3"></script>
 <script src="ui/motion.js?v=motion4"></script>
 <script src="ui/slate.js?v=dual1"></script>
-<script src="ui/integrated.js?v=shots2"></script>
+<script src="ui/integrated.js?v=routes3"></script>
 </body>
 </html>
