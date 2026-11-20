@@ -19,7 +19,7 @@ function origin(req){const o=req.headers.origin;if(!o)return 'local';return ORIG
 function serveWorkbench(req,res,pathname){
   if(req.method!=='GET')return false;
   let rel;try{rel=decodeURIComponent(pathname).replace(/^\//,'')||'index.html';}catch{return false;}
-  if(!(rel==='index.html'||rel==='README.md'||rel==='media-service/README.md'||/^docs\/(PROJECT-ASSISTANT|ARK|TASK|DEPLOY|DEMO|ARCHITECTURE|ACCEPTANCE|RUBRIC|SAMPLES)\.md$/.test(rel)||/^(assets|core|ui)\/[a-zA-Z0-9_-]+\.(css|js)$/.test(rel)||/^samples\/(catalog\.js|[a-z0-9_-]+\/[a-z0-9_-]+\.(png|jpg|svg|mp4|json|srt))$/.test(rel)))return false;
+  if(!(rel==='index.html'||rel==='README.md'||rel==='media-service/README.md'||/^docs\/(PACING|PROJECT-ASSISTANT|ARK|TASK|DEPLOY|DEMO|ARCHITECTURE|ACCEPTANCE|RUBRIC|SAMPLES)\.md$/.test(rel)||/^(assets|core|ui)\/[a-zA-Z0-9_-]+\.(css|js)$/.test(rel)||/^samples\/(catalog\.js|[a-z0-9_-]+\/[a-z0-9_-]+\.(png|jpg|svg|mp4|json|srt))$/.test(rel)))return false;
   const f=path.join(rel.startsWith('docs/')||rel==='media-service/README.md'?ROOT:WEB,rel);if(!fs.existsSync(f))return false;
   const type={'.html':'text/html','.css':'text/css','.js':'text/javascript','.md':'text/plain','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.mp4':'video/mp4','.json':'application/json','.srt':'application/x-subrip'}[path.extname(f)];
   res.writeHead(200,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});fs.createReadStream(f).pipe(res);return true;

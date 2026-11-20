@@ -4,5 +4,5 @@ const identity='商业商品广告。主角始终是参考图的同一件商品�
 const limits='只使用原图可见特征或介绍明确给出的事实；不编造售价、促销、库存、销量、认证、测评、代言或功效。不篡改包装，不生成虚构价格牌、平台标识或额外广告字；字幕由后期提供。';
 const rules=beats.map((b,i)=>identity+' 本镜广告任务 '+(i+1)+'：'+b+' '+limits);
 const planning='目标是推广该商品，不是写一组与商品无关的漂亮镜头。先从用户介绍确定受众、使用场景和一个可证实的核心卖点；未提供受众或卖点时，用可见设计细节替代，不猜功能。四镜形成一条购买理由链：'+beats.map((v,i)=>(i+1)+'. '+v).join(' ')+'。四句剧本使用简明、自然的广告口吻；不堆形容词或重复四次叫卖。'+limits+' 不要将通用限制整段复写进 prompt，系统会附上每镜广告任务。';
-const delivered=s=>s.adDirection?s.prompt+'\n\n【本镜商业广告约束】'+s.adDirection:s.prompt;
+const delivered=s=>s.adDirection?s.prompt+'\n\n【本镜商业广告约束】'+s.adDirection+(s.shootCue?'\n【拍摄节奏】'+s.shootCue:''):s.prompt;
 module.exports={beats,rules,planning,delivered};
