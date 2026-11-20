@@ -37,8 +37,10 @@
   $("#showcase").onclick=function(){var on=document.body.classList.toggle("showcase");this.textContent=on?"退出演示视图":"演示视图";};
   /* ---------- 导航 ---------- */
   function go(pane) {
-    var step = pane === "desk" ? "materials" : pane === "script" ? "script" : pane === "review" ? "review" : pane === "media" || pane === "delivery" ? "delivery" : "";
-    var target = pane === "delivery" ? "media" : pane === "script" ? "desk" : pane;
+    const ai=['ai-source','ai-script','ai-check','ai-film'].indexOf(pane);
+    document.body.dataset.flow=ai<0?'original':'ai';
+    var step = ai>=0?['materials','script','review','delivery'][ai]:pane === "desk" ? "materials" : pane === "script" ? "script" : pane === "review" ? "review" : pane === "media" || pane === "delivery" ? "delivery" : "";
+    var target = ai>=0?["desk","desk","review","media"][ai]:pane === "delivery" ? "media" : pane === "script" ? "desk" : pane;
     var selected = pane === "gallery" ? "gallery" : step ? "desk" : pane;
     document.body.dataset.workstep = step;
     document.body.dataset.surface = pane === "gallery" ? "gallery" : step ? "project" : "utility";

@@ -1,15 +1,18 @@
 {
   "name": "oneshot-studio",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
-  "description": "Local Ark director: vision storyboard, per-shot Seedance tasks and verified video assembly",
+  "description": "Original OneShot workbench with multimodal storyboards and per-shot Ark video generation",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "start": "node media-service/server.cjs",
-    "test": "node tests/ark.cjs",
-    "test:ui": "node tests/ark-ui.cjs",
+    "test": "node tests/runtime.cjs && node tests/budget.cjs && node tests/model-settings.cjs && node tests/ark.cjs",
+    "test:ui": "node tests/integrated.cjs",
+    "test:integrated": "node tests/integrated.cjs",
+    "test:showcase": "node tests/showcase.cjs",
+    "test:motion": "node tests/motion.cjs",
     "package": "python scripts/package.py"
   },
   "devDependencies": {

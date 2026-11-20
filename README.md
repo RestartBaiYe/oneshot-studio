@@ -1,9 +1,11 @@
-# OneShot Studio · 方舟 AI 导演台
+# OneShot Studio · 商品内容工作台
 
-[打开工作台](https://restartbaiye.github.io/oneshot-studio/) ｜ [下载 Windows 包](https://restartbaiye.github.io/oneshot-studio/OneShot-Windows.zip) ｜ [配置与首次运行](docs/ARK.md)
+[打开案例展厅](https://restartbaiye.github.io/oneshot-studio/) · [下载 Windows 工作台](https://restartbaiye.github.io/oneshot-studio/OneShot-Windows.zip) · [双模型配置与操作指南](docs/ARK.md)
 
-支持两条清楚区分的路径：DSH 视觉会话生成分镜并以原生 Seedance 插件逐镜确认；或独立的方舟视觉/视频接入点服务器调用。图片 → 观察与四镜脚本 → 人工批准 → 逐镜付费确认 → 取回四镜 → 剪接，输出 MP4、SRT 与含来源记录的 JSON。网页不读取 DSH 密钥、不自动建任务、不从商品图合成假视频。
+还原 0bd75329 的原工作台界面：展厅看预置作品，任务场记单区分浏览位置和真实进度，审查页保留人工批准与退回。新增的「商品图 AI 制片」复用四步页面：
 
-Windows 运行 media-service/start.bat；须 Node 18+。FFmpeg/FFprobe 用于回检、验证及剪接。无 Key 可创建本机项目、准备 DSH 交接；缺少相应视觉能力或没有完成的云任务时，没有模型成片。npm test 在本机用明确标注的媒体夹具验证，不调用付费 API。
+**商品原图＋介绍 → 已配置的图文模型写四镜脚本和提示词 → 编辑、人工批准 → 方舟视频模型逐镜生成 → 剪接 MP4、SRT 与分镜 JSON。**
 
-历史比赛资料和旧版示例针对之前的规则工作台，不是当前模型生成结果。原发布基线：0bd75329。
+公开站不接收双模型 Key。解压后运行 media-service/start.bat，打开本机页面，在左侧「模型配置」分别配置两个模型。默认不提交付费任务。无需模型也可体验原来的示例脚本；示例不代表真实云制片。
+
+验证：npm test；安装 devDependencies 并配置可用 Chromium 后 npm run test:ui。完整接口试跑使用模拟供应商，不上传真实商品图。历史比赛材料对应原版本，不当作新模型实测。
