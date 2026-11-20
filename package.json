@@ -1,28 +1,16 @@
 {
   "name": "oneshot-studio",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
-  "description": "Local-first ecommerce video workflow with explicit preset examples and human approval",
+  "description": "Local Ark director: vision storyboard, per-shot Seedance tasks and verified video assembly",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "start": "node media-service/server.cjs",
-    "test": "node tests/runtime.cjs && node tests/compositor.cjs",
-    "test:ui": "node tests/ui.cjs",
-    "test:interaction": "node tests/interaction.cjs",
-    "samples:build": "node scripts/build-samples.cjs",
-    "package": "python scripts/package.py",
-    "test:motion": "node tests/motion.cjs",
-    "doctor": "node media-service/doctor.cjs",
-    "test:budget": "node tests/budget.cjs",
-    "test:rehearsal": "node tests/rehearsal.cjs",
-    "test:contest": "node tests/contest.cjs",
-    "test:slate": "node tests/slate.cjs",
-    "test:showcase": "node tests/showcase.cjs",
-    "test:workbench": "node tests/workbench.cjs",
-    "test:first-result": "node tests/first-result.cjs",
-    "test:render": "node tests/render.cjs"
+    "test": "node tests/ark.cjs",
+    "test:ui": "node tests/ark-ui.cjs",
+    "package": "python scripts/package.py"
   },
   "devDependencies": {
     "playwright-core": "1.65.1"
