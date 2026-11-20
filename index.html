@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="assets/studio.css?v=steps3">
 <link rel="stylesheet" href="assets/screening.css?v=screen1">
 <link rel="stylesheet" href="assets/slate.css?v=slate1">
+<link rel="stylesheet" href="assets/contest.css?v=contest1">
 </head>
 <body>
 <div id="app">
@@ -201,7 +202,7 @@
             <input type="password" id="cfgKey" placeholder="sk-…">
             <label class="f">模型名</label>
             <input type="text" id="cfgModel" placeholder="gpt-4o-mini / qwen2.5:7b / deepseek-chat">
-            <div class="rowbtns"><button class="btn" id="btnCfgSave">保存并探测</button><button class="btn ghost" id="btnCfgReset">回到离线</button></div>
+            <fieldset class="model-budget"><legend>模型调用预算</legend><label>单任务最多请求 <input id="cfgCallLimit" type="number" min="1" max="8" value="4"></label><label>输入参考价（元 / 百万 token）<input id="cfgInputRate" type="number" min="0" step="any" placeholder="未知，留空"></label><label>输出参考价（同单位）<input id="cfgOutputRate" type="number" min="0" step="any" placeholder="未知，留空"></label><p>请求次数是硬上限；费用按返回用量与填写单价估算，不是服务商账单。探测单独计一次请求。</p></fieldset><div class="rowbtns"><button class="btn" id="btnCfgSave">保存并探测</button><button class="btn ghost" id="btnCfgReset">回到离线</button></div>
             <p class="hint" id="cfgNote">当前：offline · 未发起任何网络请求。</p>
           </div>
           <div class="card">
@@ -238,15 +239,17 @@
   <button id="btnSrt"></button><button id="btnSht"></button><button id="btnMemClear"></button>
 </div>
 
-<script src="core/engine.js?v=screen1"></script>
-<script src="core/llm.js?v=motion4"></script>
-<script src="core/tools.js?v=motion4"></script>
-<script src="core/agent.js?v=screen1"></script>
-<script src="ui/shell.js?v=slate1"></script>
-<script src="ui/studio.js?v=steps3"></script>
-<script src="ui/media.js?v=slate1"></script>
+<script src="core/memory.js?v=contest1"></script>
+<script src="core/engine.js?v=contest1"></script>
+<script src="core/llm.js?v=contest1"></script>
+<script src="core/tools.js?v=contest1"></script>
+<script src="core/planner.js?v=contest1"></script>
+<script src="core/agent.js?v=contest1"></script>
+<script src="ui/shell.js?v=contest1"></script>
+<script src="ui/studio.js?v=contest1"></script>
+<script src="ui/media.js?v=contest1"></script>
 <script src="samples/catalog.js?v=motion4"></script>
-<script src="ui/gallery.js?v=slate1"></script>
+<script src="ui/gallery.js?v=contest1"></script>
 <script src="ui/motion.js?v=motion4"></script>
 <script src="ui/slate.js?v=slate1"></script>
 </body>

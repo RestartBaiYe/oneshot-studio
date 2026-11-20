@@ -4,10 +4,20 @@
 (function (root) {
   var T = [];
 
-  function def(id, title, scope, schema, run) { T.push({ id: id, title: title, scope: scope, schema: schema, run: run }); }
+  const required={"memory.recall":["brief"],"brief.parse":["brief"],"facts.extract":["brief"],"compliance.scan":["text"],"script.draft":["brief","platform"],"subtitle.fit":["lines","platform"],"review.judge":["lines","brief","platform"],"stage.preview":["lines","brief","platform"],"deliver.export":["lines","brief","platform"],"memory.write":["brief","passed","total","rounds","first"],"script.revise":["lines"]};
+  const outputs={
+    'memory.recall':o=>Array.isArray(o.recent)&&Number.isInteger(o.hit),'brief.parse':o=>typeof o.name==='string'&&Array.isArray(o.selling),'facts.extract':o=>Array.isArray(o.rows)&&o.count===o.rows.length,'compliance.scan':o=>Array.isArray(o.hits)&&typeof o.clean==='boolean',
+    'script.draft':o=>!!(validateLines(o.lines)===undefined),'subtitle.fit':o=>validateLines(o.lines)===undefined&&Array.isArray(o.truncated),'script.revise':o=>validateLines(o.lines)===undefined&&o.revised===true,
+    'review.judge':o=>Array.isArray(o.checks)&&o.checks.length===8&&o.checks.every(c=>c&&typeof c.name==='string'&&typeof c.ok==='boolean')&&Array.isArray(o.subs)&&o.subs.length===4&&o.subs.every(x=>typeof x==='string')&&Array.isArray(o.fails)&&o.pass===o.checks.every(c=>c.ok)&&o.fails.length===o.checks.filter(c=>!c.ok).length,
+    'deliver.export':o=>Array.isArray(o.files)&&o.files.length===4&&o.bytes>0,'stage.preview':o=>o.scenes===4&&o.duration>0,'memory.write':o=>typeof o.written==='boolean'
+  };
+  function register(spec){if(!spec||get(spec.id)||!Array.isArray(spec.required)||typeof spec.output!=='function'||typeof spec.run!=='function'||!['read','write','publish'].includes(spec.scope))throw Error('工具注册契约无效');T.push(spec);}
+  function validateResult(id,obs){const tool=get(id);if(!tool||!obs||typeof obs!=='object'||!tool.output(obs))throw Error('工具结果不符合契约：'+id);}
+  function def(id, title, scope, schema, run) { register({id,title,scope,schema,required:required[id],output:outputs[id],run}); }
   function get(id) { for (var i = 0; i < T.length; i++) if (T[i].id === id) return T[i]; return null; }
   function list() { return T.map(function (t) { return { id: t.id, title: t.title, scope: t.scope, schema: t.schema }; }); }
 
+  function briefClauses(v){return String(v).split(/[，,。；;\n]/).map(s=>s.trim()).filter(Boolean);}
   function need(v, name) { if (v === undefined || v === null || v === "") throw new Error("缺少参数 " + name); return v; }
 
   def("brief.parse", "解析商品 brief", "read",
@@ -21,7 +31,7 @@
   def("facts.extract", "抽取事实表（价格/参数/材质）", "read",
     "{ brief: string }", function (a) {
       var rows = root.extractFacts(String(need(a.brief, "brief")));
-      return { count: rows.length, rows: rows.map(function (r) { return { k: r.k, v: r.v, src: r.src }; }) };
+      return {count:rows.length,rows:rows.map(r=>{const clean=x=>String(x).replace(/\s/g,'').toLowerCase();const quote=briefClauses(a.brief).find(s=>clean(s).includes(clean(r.v)));return {k:r.k,v:r.v,src:r.src,quote:quote||null};})};
     });
 
   def("compliance.scan", "广告法违禁词扫描", "read",
@@ -105,27 +115,29 @@
 
   def("memory.recall", "检索历史执行记忆（同类 brief 的退回原因）", "read",
     "{ brief: string }", function (a) {
-      var key = String(a.brief || "").slice(0, 6), all = root.memLoad ? root.memLoad() : [];
-      var hit = all.filter(function (r) { return (r.name || "").indexOf(key) >= 0 || key.indexOf(String(r.name || "").slice(0, 3)) >= 0; });
-      var recent = all.slice(-5);
-      return { total: all.length, hit: hit.length, recent: recent.map(function (r) { return { name: r.name, first: r.first }; }) };
+      return root.TaskMemory.recall(a.brief);
     });
 
   def("memory.write", "把本次执行写入记忆", "write",
     "{ brief: string, passed: number, total: number, rounds: number, first: array }", function (a) {
-      if (root.memAdd) root.memAdd({ t: Date.now(), name: root.parseBrief(String(a.brief)).name, plat: "agent",
+      var written=!!root.memAdd&&root.memAdd({ t: Date.now(), name: root.parseBrief(String(a.brief)).name, plat: "agent",
         passed: a.passed, total: a.total, rounds: a.rounds, first: a.first || [] });
-      return { written: true };
+      return { written:written===true };
     });
+
+  def("script.revise","根据审片意见修订","write","{ lines: object, fails?: array }",function(a,ctx){
+    var lines=a.fails?Object.assign({},ctx.lines):a.lines;
+    if(a.fails){var fallback=root.makeScript(root.parseBrief(ctx.brief),root.PLAT[ctx.platform]);["hook","claim","proof","cta"].forEach(function(k){var s=String(lines[k]||"");root.BANNED.forEach(function(b){s=s.replace(new RegExp(b[1].source,"g"),"");});if(a.fails.includes("事实一致")&&root.unsupportedFacts(s,ctx.brief).length)s=fallback[k];lines[k]=s||"查看商品详情";});}
+    root.Tools.validateLines(lines);return {lines:lines,revised:true};
+  });
 
   function validateLines(lines){
     if(!lines||typeof lines!=="object"||Array.isArray(lines))throw new Error("文案必须是四字段对象");
     ["hook","claim","proof","cta"].forEach(function(k){if(typeof lines[k]!=="string"||!lines[k].trim()||lines[k].length>1000)throw new Error("文案字段无效："+k);});
   }
   function validate(id,a){
-    var schemas={"memory.recall":["brief"],"brief.parse":["brief"],"facts.extract":["brief"],"compliance.scan":["text"],"script.draft":["brief","platform"],"subtitle.fit":["lines","platform"],"review.judge":["lines","brief","platform"],"stage.preview":["lines","brief","platform"],"deliver.export":["lines","brief","platform"],"memory.write":["brief","passed","total","rounds","first"],"script.revise":["lines"]};
-    if(!get(id)||!schemas[id])throw new Error("未知工具");
-    schemas[id].forEach(function(k){if(a[k]===undefined||a[k]===null)throw new Error("工具 "+id+" 缺少输入："+k);});
+    if(!get(id))throw new Error("未知工具");
+    get(id).required.forEach(function(k){if(a[k]===undefined||a[k]===null)throw new Error("工具 "+id+" 缺少输入："+k);});
     if(a.brief!==undefined&&(typeof a.brief!=="string"||!a.brief.trim()||a.brief.length>12000))throw new Error("brief 无效或超长");
     if(a.text!==undefined&&(typeof a.text!=="string"||a.text.length>12000))throw new Error("text 无效或超长");
     if(a.platform!==undefined&&!root.PLAT[a.platform])throw new Error("未知平台");
@@ -140,5 +152,5 @@
     function cell(s){s=String(s);if(/^[=+@-]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
     return {txt:"商品 brief："+ctx.brief+"\n\n"+subs.join("\n"),srt:srt,csv:"序号,时长,字幕\n"+subs.map(function(s,i){return [i+1,plat.dur[i],cell(s)].join(",");}).join("\n"),md:"# 规则审片报告\n\n平台："+plat.name+"；轮次："+ctx.round+"。仅规则初筛，需人工复核。\n\n"+ctx.verdict.checks.map(function(c){return "- "+c.name+"："+(c.ok?"通过":"未过")+"；"+c.detail;}).join("\n")};
   }
-  root.Tools = { all:T,get:get,list:list,validate:validate,validateLines:validateLines,buildFiles:buildFiles };
+  root.Tools = { register,validateResult,get:get,list:list,validate:validate,validateLines:validateLines,buildFiles:buildFiles };
 })(window);

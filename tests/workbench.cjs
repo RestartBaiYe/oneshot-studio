@@ -6,14 +6,14 @@ const base=before?'http://127.0.0.1:41938':local, dir=process.env.EVIDENCE_DIR||
  let server,browser;
  try{
   if(before){server=spawn(process.execPath,['media-service/server.cjs'],{cwd:path.join(root,'github-release'),env:{...process.env,ONESHOT_PORT:'41938'}});await new Promise((resolve,reject)=>{server.once('exit',()=>reject(Error('baseline service unavailable')));server.stdout.once('data',resolve);server.once('error',reject)});}
-  browser=await chromium.launch({channel:'msedge'}); fs.mkdirSync(dir,{recursive:true});
+  browser=await chromium.launch(process.env.BROWSER_PATH?{executablePath:process.env.BROWSER_PATH}:{channel:'msedge'}); fs.mkdirSync(dir,{recursive:true});
   for(const [width,theme] of [[1280,'light'],[390,'dark']]){
    const page=await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce'});
    await page.goto(base+'/?demo=1');await page.click('#newProject');if((await page.locator('html').getAttribute('data-theme')==='dark')!==(theme==='dark'))await page.click('#themeSwitch');
    for(const [tab,id] of [['desk','materials'],['script','script'],['review','review'],['media','delivery']]){
     await page.click('[data-go="'+tab+'"]');assert.equal(await page.locator('[aria-current="step"]').getAttribute('data-workstep'),id);
     assert(await page.locator('#pane-'+(tab==='script'?'desk':tab)).isVisible());
-    if(tab==='media')await page.waitForFunction(()=>document.querySelector('#mediaServiceState').textContent.includes('已连接'));
+    if(tab==='media')await page.waitForFunction(()=>document.querySelector('#mediaServiceState').textContent.match(/已连接|已就绪/));
     await page.screenshot({path:path.join(dir,(before?'before':'after')+'-'+width+'-'+theme+'-'+id+'.png')});
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
    }await page.close();

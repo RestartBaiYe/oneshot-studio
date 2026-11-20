@@ -7,7 +7,7 @@
 (function (root) {
   var LLM = {
     active: "offline",
-    cfg: { base: "", key: "", model: "gpt-4o-mini", temp: 0.3 },
+    cfg: { base: "", key: "", model: "gpt-4o-mini", temp: 0.3, callLimit:4, inputRate:null, outputRate:null },
     stats: { calls: 0, promptChars: 0, completionChars: 0, costCny: 0, ms: 0 },
     log: [],
 
@@ -18,14 +18,12 @@
       try { var response = await fetch(url, Object.assign({}, options || {}, { signal: controller.signal })); var body = await response.text(); return { ok: response.ok, status: response.status, json: async function(){return JSON.parse(body);} }; }
       finally { clearTimeout(timer); if(this.controller === controller) this.controller = null; }
     },
-    price: function (model) {
-      var m = String(model || "").toLowerCase();
-      if (m.indexOf("deepseek") >= 0) return { in: 1.0, out: 2.0 };
-      if (m.indexOf("qwen") >= 0) return { in: 2.0, out: 6.0 };
-      return { in: 3.5, out: 10.5 };
-    },
-
+    resetMeter: function(){this.stats={calls:0,promptChars:0,completionChars:0,ms:0,inputTokens:0,outputTokens:0,missingUsage:0,costCny:this.active==='offline'?0:null,callLimit:this.cfg.callLimit};this.log=[];},
     setConfig: function (c) {
+      const limit=Number(c.callLimit??4),rate=v=>v===null||v===undefined||v===''?null:Number(v);const inRate=rate(c.inputRate),outRate=rate(c.outputRate);
+      if(!Number.isInteger(limit)||limit<1||limit>8||[inRate,outRate].some(v=>v!==null&&(!Number.isFinite(v)||v<0)))throw Error('预算需为 1–8 次，参考单价须为非负数或留空');
+      if(c.base){const u=new URL(c.base);if(!['http:','https:'].includes(u.protocol)||u.username||u.password||u.search||u.hash)throw Error('只接受不含凭据或查询参数的模型端点');if(u.protocol==='http:'&&!['localhost','127.0.0.1','[::1]'].includes(u.hostname))throw Error('非本机端点必须使用 HTTPS');}
+      this.cfg.callLimit=limit;this.cfg.inputRate=inRate;this.cfg.outputRate=outRate;
       this.cfg.base = (c.base || "").replace(/\/+$/, "");
       this.cfg.key = c.key || "";
       this.cfg.model = c.model || this.cfg.model;
@@ -63,6 +61,10 @@
 
     chat: async function (messages, opts) {
       opts = opts || {};
+      if(this.active==="offline")return {text:"",offline:true,error:"未配置模型"};
+      if(this.stats.calls>=this.cfg.callLimit)return {text:"",offline:true,error:"达到本次模型请求预算（"+this.cfg.callLimit+" 次）；未发出额外请求"};
+      if(messages.reduce((n,m)=>n+String(m.content||"").length,0)>24000)return {text:"",offline:true,error:"模型输入超出 24000 字符限制"};
+      this.stats.calls++;
       var t0 = performance.now();
       var out = null;
       if (this.active === "ollama") out = await this.ollama(messages, opts);
@@ -74,11 +76,11 @@
       }
       var ms = Math.round(performance.now() - t0);
       var pc = messages.map(function (m) { return m.content || ""; }).join("").length;
-      this.stats.calls++;
       this.stats.ms += ms;
       this.stats.promptChars += pc;
       this.stats.completionChars += (out.text || "").length;
-      // 兼容接口的实际计价由服务商账单确定，不根据模型名猜测。
+      const u=out.usage;if(u&&Number.isSafeInteger(u.input)&&u.input>=0&&Number.isSafeInteger(u.output)&&u.output>=0){this.stats.inputTokens+=u.input;this.stats.outputTokens+=u.output;}else this.stats.missingUsage++;
+      this.stats.costCny=this.stats.missingUsage||this.cfg.inputRate==null||this.cfg.outputRate==null?null:(this.stats.inputTokens*this.cfg.inputRate+this.stats.outputTokens*this.cfg.outputRate)/1e6;
       this.log.push({ at: Date.now(), provider: this.active, model: this.cfg.model, ms: ms, chars: pc, offline: !!out.offline });
       return out;
     },
@@ -90,13 +92,13 @@
           headers: { "Content-Type": "application/json", "Authorization": "Bearer " + this.cfg.key },
           body: JSON.stringify({
             model: this.cfg.model, messages: messages, temperature: opts.temp != null ? opts.temp : this.cfg.temp,
-            max_tokens: opts.maxTokens || 900, response_format: opts.json ? { type: "json_object" } : undefined
+            max_tokens: Math.min(opts.maxTokens || 900,900), response_format: opts.json ? { type: "json_object" } : undefined
           })
         });
         if (!r.ok) return { text: "", offline: true, error: "HTTP " + r.status };
         var j = await r.json();
         var txt = (((j.choices || [])[0] || {}).message || {}).content || "";
-        return { text: txt, offline: false };
+        return { text: txt, offline:false, usage:{input:j.usage?.prompt_tokens,output:j.usage?.completion_tokens} };
       } catch (e) { return { text: "", offline: true, error: String(e) }; }
     },
 
@@ -105,11 +107,11 @@
         var r = await this.request(this.cfg.base + "/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ model: this.cfg.model, messages: messages, stream: false, format: opts.json ? "json" : undefined })
+          body: JSON.stringify({ model: this.cfg.model, messages: messages, stream: false, options:{num_predict:Math.min(opts.maxTokens||900,900)}, format: opts.json ? "json" : undefined })
         });
         if (!r.ok) return { text: "", offline: true, error: "HTTP " + r.status };
         var j = await r.json();
-        return { text: (j.message || {}).content || "", offline: false };
+        return { text: (j.message || {}).content || "", offline: false,usage:{input:j.prompt_eval_count,output:j.eval_count} };
       } catch (e) { return { text: "", offline: true, error: String(e) }; }
     },
 
@@ -119,5 +121,5 @@
       return "OpenAI 兼容 · " + this.cfg.model;
     }
   };
-  root.LLM = LLM;
+  LLM.resetMeter();root.LLM = LLM;
 })(window);

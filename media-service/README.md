@@ -8,7 +8,7 @@
 
 双击本目录的 start.bat，看到 listening 后打开 **http://127.0.0.1:41739/?demo=1**。不必另开静态服务器。保持服务窗口运行，Ctrl+C 停止。
 
-默认使用 PATH 中的 ffmpeg 和 ffprobe；自定义安装可在启动前设置 FFMPEG_PATH、FFPROBE_PATH。ONESHOT_PORT 可改端口。服务启动会验证两种可执行文件，缺失时直接报错。
+默认使用 PATH 中的 ffmpeg 和 ffprobe；自定义安装可在启动前设置 FFMPEG_PATH、FFPROBE_PATH。ONESHOT_PORT 可改端口。启动时用实际字体进行三帧 H.264 / drawtext 编码，再由 FFprobe 核验编码及帧数。未通过不会监听端口；可单独运行 node media-service/doctor.cjs 预检。
 
 命令行也可在项目根目录运行：
 

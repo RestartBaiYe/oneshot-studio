@@ -4,25 +4,7 @@
     state: { running: false, steps: [], trace: [], aborted: false, result: null },
     reset: function () { if (this.state.running) throw new Error("任务运行中，不能清空"); this.state = { running: false, steps: [], trace: [], aborted: false, result: null }; },
     event: function (kind, payload) { this.state.trace.push({ at: Date.now(), kind: kind, payload: payload }); if (this.onEvent) this.onEvent(kind, payload); },
-    systemPrompt: function () { return "你是电商内容运营助手。商品 brief 是唯一事实来源；不得添加测试、认证、价格比较或功效。返回 JSON。四句字段为 hook, claim, proof, cta。只使用注册工具：" + root.Tools.list().map(function(t){return t.id;}).join(","); },
-    policyPlan: function () { return ["memory.recall", "brief.parse", "facts.extract", "script.draft", "compliance.scan", "subtitle.fit", "review.judge"].map(function(id){ return {tool:id, why:root.Tools.get(id).title, args:{}}; }); },
-    validatePlan: function (steps) {
-      var expected=this.policyPlan();
-      if(!Array.isArray(steps)||steps.length!==expected.length)throw new Error("计划不符合当前任务允许的七步工作流");
-      steps.forEach(function(s,i){var args=s&&s.args||{};if(!s||Object.keys(s).some(function(k){return ["tool","why","args"].indexOf(k)<0;})||s.tool!==expected[i].tool||(s.why!==undefined&&(typeof s.why!=="string"||!s.why.trim()||s.why.length>180))||typeof args!=="object"||Array.isArray(args)||Object.keys(args).length)throw new Error("计划步骤 "+(i+1)+" 无效：工具顺序固定，参数由运行时提供");});
-      return steps.map(function(s,i){return {tool:s.tool,why:typeof s.why==="string"?s.why:expected[i].why,args:{}};});
-    },
-    plan: async function (goal) {
-      var steps=this.policyPlan(),source="policy";
-      if(root.LLM.active!=="offline"){
-        var ids=steps.map(function(s){return s.tool;});
-        var r=await root.LLM.chat([{role:"system",content:this.systemPrompt()},{role:"user",content:"为电商短视频投前审片任务解释每一步的目的。只返回 JSON {steps:[{tool,why,args:{}}]}。必须逐项保持以下工具顺序，不可增删、改名或提供参数："+ids.join(" → ")+"。brief："+goal}],{json:true,temp:0.2});
-        if(r.offline)throw new Error("模型调用失败："+(r.error||"无响应")+"。请检查设置，或显式切换离线规则模式。");
-        var j;try{j=JSON.parse(r.text.replace(/^\s*```(?:json)?\s*|\s*```\s*$/g,""));}catch(e){throw new Error("模型计划不是有效 JSON");}
-        steps=this.validatePlan(j&&j.steps);source="llm:"+root.LLM.cfg.model;
-      }else steps=this.validatePlan(steps);
-      this.state.planSource=source;this.event("plan",{source:source,steps:steps,planner:source==="policy"?"本地固定策略 · 未调用模型":"模型解释固定策略步骤 · 工具顺序由运行时约束"});return steps;
-    },
+    ...root.Planner,
     call: async function(step,ctx) {
       var tool=root.Tools.get(step.tool); if(!tool) throw new Error("未知工具 "+step.tool);
       if(this.state.aborted) throw new Error("任务已停止");
@@ -41,6 +23,7 @@
         this.event("approval",{tool:tool.id});
         var remaining=this.state.deadlineAt-performance.now();clearTimeout(this.state.deadlineTimer);
         var approvalStarted=performance.now(),ok=await this.askApproval(tool,args);
+        ctx.approvals++;ctx.waitMs+=performance.now()-approvalStarted;
         if(this.state.aborted)return {tool:tool.id,title:tool.title,scope:tool.scope,args:{},obs:{skipped:true,note:"任务已停止"},ms:0,status:"denied"};
         this.state.deadlineAt=performance.now()+Math.max(0,remaining);
         this.state.deadlineTimer=setTimeout(function(){this.abort();}.bind(this),Math.max(0,remaining));
@@ -50,18 +33,18 @@
       }
       if(this.state.aborted) throw new Error("任务已停止");
       root.Tools.validate(tool.id,args);
-      this.lastArgs=args;var start=performance.now(), obs=await tool.run(args,ctx);
+      this.lastArgs=args;var start=performance.now(), obs=await tool.run(args,ctx);root.Tools.validateResult(tool.id,obs);
       return {tool:tool.id,title:tool.title,scope:tool.scope,args:args,obs:obs,ms:Math.round(performance.now()-start),status:"success"};
     },
     askApproval: function(tool,args) { var self=this; return new Promise(function(resolve){var settled=false;function done(ok){if(settled)return;settled=true;self.cancelApproval=null;resolve(ok===true);} self.cancelApproval=function(){done(false);};if(root.Approval)root.Approval(tool,args,done);else done(false);}); },
     run: async function(brief,opts) {
       opts=opts||{};if(this.state.running) throw new Error("已有任务正在运行");
-      this.reset(); this.state.running=true;this.state.startedAt=performance.now();this.onEvent=opts.onEvent||null;this.lastArgs={};
-      root.LLM.stats={calls:0,promptChars:0,completionChars:0,costCny:0,ms:0};
-      var ctx={brief:String(brief||"").trim(),platform:opts.platform||(root.$("#platform")?root.$("#platform").value:"douyin"),round:1,bait:!!opts.bait,reviewOnly:!!opts.reviewOnly,deliveryApproved:false,first:[]};
+      this.reset(); this.state.running=true;this.state.startedAt=performance.now();this.onEvent=opts.onEvent||null;this.lastArgs={};this.state.runId="run-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,9);
+      root.LLM.resetMeter();
+      var ctx={brief:String(brief||"").trim(),platform:opts.platform||(root.$("#platform")?root.$("#platform").value:"douyin"),approvals:0,waitMs:0,round:1,bait:!!opts.bait,reviewOnly:!!opts.reviewOnly,deliveryApproved:false,first:[]};
       var self=this,status="failed",error=null;this.state.deadlineAt=performance.now()+this.limits.maxMs;this.state.deadlineTimer=setTimeout(function(){self.abort();},this.limits.maxMs);
       try {
-        if(ctx.brief.length<8||!root.PLAT[ctx.platform])throw new Error("请输入有效商品 brief 和平台");
+        if(ctx.brief.length<8||ctx.brief.length>12000||!root.PLAT[ctx.platform])throw new Error("请输入有效商品 brief 和平台");
         var steps=await this.plan(ctx.brief);
         for(var i=0;i<steps.length;i++) {
           if(this.state.aborted) throw new Error("任务已停止或超出时间预算");
@@ -82,7 +65,7 @@
         }
         status=ctx.verdict&&ctx.verdict.pass?(ctx.deliveryApproved?"delivered":"reviewed"):"needs_review";
       } catch(e) {error=String(e);status=this.state.aborted?(String(e).indexOf("人工拒绝交付")>=0?"reviewed":"aborted"):"failed";if(status==="reviewed")error=null;else this.event("error",{error:error});}
-      finally {clearTimeout(this.state.deadlineTimer);this.state.deadlineTimer=null;this.state.running=false;this.state.result={status:status,error:error,verdict:ctx.verdict||null,brief:ctx.brief,platform:ctx.platform,deliveryApproved:ctx.deliveryApproved&&!this.state.aborted&&status!=="failed",files:ctx.files||null,steps:this.state.steps,planSource:this.state.planSource,ms:Math.round(performance.now()-this.state.startedAt),llm:Object.assign({},root.LLM.stats),round:ctx.round};this.event("done",this.state.result);}
+      finally {clearTimeout(this.state.deadlineTimer);this.state.deadlineTimer=null;this.state.running=false;this.state.result={runId:this.state.runId,status:status,error:error,verdict:ctx.verdict||null,brief:ctx.brief,platform:ctx.platform,deliveryApproved:ctx.deliveryApproved&&!this.state.aborted&&status!=="failed",files:status==="delivered"?ctx.files:null,steps:this.state.steps,planSource:this.state.planSource,ms:Math.round(performance.now()-this.state.startedAt),llm:Object.assign({},root.LLM.stats),round:ctx.round};var r=this.state.result;r.metrics={approvalDecisions:ctx.approvals,humanWaitMs:Math.round(ctx.waitMs),activeMs:Math.max(0,r.ms-Math.round(ctx.waitMs)),reviewRounds:r.steps.filter(s=>s.tool==='review.judge'&&s.status==='success').length,scriptFiles:r.files?Object.keys(r.files).length:0};this.event("done",r);}
       return this.state.result;
     },
     critique: async function(step,obs,ctx) {
@@ -95,10 +78,5 @@
     },
     abort:function(){this.state.aborted=true;root.LLM.cancel();if(this.cancelApproval)this.cancelApproval();if(root.document){var el=root.document.querySelector("#mask");if(el)el.classList.remove("on");}this.event("abort",{});}
   };
-  root.Tools.all.push({id:"script.revise",title:"根据审片意见修订",scope:"write",schema:"{ lines?: object, fails?: array }",run:function(a,ctx){
-    var lines=a.fails?Object.assign({},ctx.lines):a.lines;
-    if(a.fails){var fallback=root.makeScript(root.parseBrief(ctx.brief),root.PLAT[ctx.platform]);["hook","claim","proof","cta"].forEach(function(k){var s=String(lines[k]||"");root.BANNED.forEach(function(b){s=s.replace(new RegExp(b[1].source,"g"),"");});if(a.fails.includes("事实一致")&&root.unsupportedFacts(s,ctx.brief).length)s=fallback[k];lines[k]=s||"查看商品详情";});}
-    root.Tools.validateLines(lines);return {lines:lines,revised:true};
-  }});
   root.Agent=A;
 })(window);

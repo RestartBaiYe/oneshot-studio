@@ -2,7 +2,7 @@
 
 ## 运行分层
 
-浏览器：index.html → core/engine.js（既有规则与分镜）→ llm.js（可选模型适配）→ tools.js（本地工具注册/验证）→ agent.js（有限工作流）→ ui/shell.js、studio.js、media.js、gallery.js、motion.js（视图、证据、媒体、案例）。以浏览器原生 API 为主，无前端框架或服务端 npm 运行依赖。Playwright 仅为开发测试依赖。
+浏览器：index.html → core/memory.js（本机记忆，最多保留 200 条；仅取同品最近 3 条）→ engine.js（规则与分镜）→ llm.js（适配、用量、请求预算）→ tools.js（注册、输入与工具结果验证）→ planner.js（固定计划及模型解释校验）→ agent.js（编排、预算、审批）→ ui/shell.js、studio.js、media.js、gallery.js、motion.js（视图、证据、媒体、案例）。以浏览器原生 API 为主，无前端框架或服务端 npm 运行依赖。Playwright 仅为开发测试依赖。
 
 本机：media-service/server.cjs 使用 Node HTTP、shell:false 子进程和 FFmpeg/FFprobe，绑定 127.0.0.1。公共 Pages 只提供静态文件；模型请求不经 OneShot 后端。
 

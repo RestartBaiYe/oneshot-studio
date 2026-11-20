@@ -50,8 +50,8 @@ function parseBrief(brief){
 var TRACE = [], STORY = null, T = 0, raf = 0;
 
 var MEMKEY = "oneshot.mem.v1";
-function memLoad(){ try { return JSON.parse(localStorage.getItem(MEMKEY) || "[]"); } catch(e){ return []; } }
-function memSave(a){ try { localStorage.setItem(MEMKEY, JSON.stringify(a.slice(-200))); } catch(e){} }
+function memLoad(){return TaskMemory.read();}
+function memSave(a){return TaskMemory.write(a);}
 function memTop(a){
   var c = {};
   a.forEach(function(r){ (r.first || []).forEach(function(n){ c[n] = (c[n] || 0) + 1; }); });
@@ -63,7 +63,7 @@ function memNote(first){
   memLoad().forEach(function(r){ if((r.first || []).some(function(x){ return first.indexOf(x) >= 0; })) n++; });
   return n >= 2 ? "记忆提示：这条和你本机此前 " + n + " 条退回同因（" + first.join(" / ") + "），重点看这里。" : "";
 }
-function memAdd(rec){ var a = memLoad(); a.push(rec); memSave(a); renderMem(); }
+function memAdd(rec){ var a = memLoad(); a.push(rec); var written=memSave(a);renderMem();return written; }
 function renderMem(){
   var box = $("#mem"); if(!box) return;
   var a = memLoad();

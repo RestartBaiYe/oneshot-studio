@@ -355,6 +355,7 @@
 
   /* ---------- 设置 ---------- */
   function renderCfg() {
+    $("#cfgCallLimit").value=LLM.cfg.callLimit;$("#cfgInputRate").value=LLM.cfg.inputRate??'';$("#cfgOutputRate").value=LLM.cfg.outputRate??'';
     $("#cfgBase").value = LLM.cfg.base || "";
     $("#cfgKey").value = LLM.cfg.key || "";
     $("#cfgModel").value = LLM.cfg.model || "";
@@ -365,7 +366,7 @@
   }
   $("#btnCfgSave").onclick = async function () {
     var base = $("#cfgBase").value.trim();
-    LLM.setConfig({ base: base, key: $("#cfgKey").value.trim(), model: $("#cfgModel").value.trim() || LLM.cfg.model });
+    if(Workbench.busy())return toast('请在当前任务结束后修改模型设置');try{LLM.setConfig({base,key:$("#cfgKey").value.trim(),model:$("#cfgModel").value.trim()||LLM.cfg.model,callLimit:$("#cfgCallLimit").value,inputRate:$("#cfgInputRate").value,outputRate:$("#cfgOutputRate").value});LLM.resetMeter();}catch(e){$("#cfgNote").textContent=e.message;return;}
     if (!base) { renderCfg(); return toast("已回到离线确定性策略"); }
     if (base.indexOf("11434") >= 0) {
       var ok = await LLM.probeOllama();
@@ -377,7 +378,7 @@
     $("#cfgNote").textContent=probe.offline?"连接失败："+probe.error:"已验证模型响应 · "+LLM.cfg.model;
     toast(probe.offline?"模型连接失败，请检查端点或跨域设置":"模型连接验证成功");
   };
-  $("#btnCfgReset").onclick = function () { LLM.setConfig({ base: "", key: "", model: LLM.cfg.model }); renderCfg(); toast("已回到离线确定性策略"); };
+  $("#btnCfgReset").onclick = function () { if(Workbench.busy())return toast("请等待当前任务结束");LLM.setConfig({ base: "", key: "", model: LLM.cfg.model }); renderCfg(); toast("已回到离线确定性策略"); };
 
   /* ---------- 清空 / 记忆 ---------- */
   $("#btnClear").onclick = function () { if(Agent.state.running || batchRunning)return toast("请先停止任务"); LAST=null; STORY=null; tlReset(); Agent.reset(); renderTrace(); renderScript([]); phase(0,"轨迹已清空。填写商品信息后重新运行。"); document.querySelectorAll("#exports button, #expTxt2, #expSrt2, #expCsv2, #expMd2").forEach(function(b){b.disabled=true;}); $("#status").className = "status"; $("#statusTxt").textContent = "待命"; toast("轨迹已清空"); };
