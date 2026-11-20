@@ -11,3 +11,5 @@
 验证：npm test；安装 devDependencies 并配置可用 Chromium 后 npm run test:ui。完整接口试跑使用模拟供应商，不上传真实商品图。历史比赛材料对应原版本，不当作新模型实测。
 
 商业广告分镜支持原图参考预览、单镜脚本文案与提示词编辑、AI 优化候选对照、逐镜视频回放和终态重试；见 [分镜工作流](docs/ARK.md)。
+
+[项目广告助手：在同一分镜台查询依据、延续讨论和提出单镜候选](docs/PROJECT-ASSISTANT.md)。
