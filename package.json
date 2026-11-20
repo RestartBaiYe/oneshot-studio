@@ -8,12 +8,13 @@
   },
   "scripts": {
     "start": "node media-service/server.cjs",
-    "test": "node tests/runtime.cjs && node tests/budget.cjs && node tests/model-settings.cjs && node tests/ark.cjs",
+    "test": "node tests/runtime.cjs && node tests/budget.cjs && node tests/model-settings.cjs && node tests/ark.cjs && node tests/shot-retry.cjs && node tests/vision-http.cjs",
     "test:ui": "node tests/integrated.cjs",
     "test:integrated": "node tests/integrated.cjs",
     "test:showcase": "node tests/showcase.cjs",
     "test:motion": "node tests/motion.cjs",
-    "package": "python scripts/package.py"
+    "package": "python scripts/package.py",
+    "test:shots": "node tests/shot-retry.cjs && node tests/integrated.cjs"
   },
   "devDependencies": {
     "playwright-core": "1.65.1"
