@@ -91,12 +91,22 @@ function makeScript(p,plat,rnd){
 }
 function clampSub(s, max){ return s.length<=max ? s : s.slice(0, max-1).replace(/[，,、]$/,"")+"…"; }
 
-function review(subs, p, brief, facts, plat){
-  var issues = [], nums = briefNumbers(brief), total = plat.dur.reduce(function(a,b){return a+b;},0);
-  var texts = subs.join(" ");
+function unsupportedFacts(texts, brief){
+  var nums=briefNumbers(brief);
   var numsInText = texts.match(/\d+(?:\.\d+)?/g) || [];
   var uniq = [];
   numsInText.forEach(function(n){ if(nums.indexOf(n) < 0 && uniq.indexOf(n) < 0) uniq.push(n); });
+  var normalized=brief.replace(/\s/g,"").toLowerCase();
+  var quantities=texts.match(/\d+(?:\.\d+)?\s*(?:小时|分钟|天|℃|度|克|kg|ml|g|次|年|L|元|%)/gi)||[];
+  quantities.forEach(function(q){if(normalized.indexOf(q.replace(/\s/g,"").toLowerCase())<0 && uniq.indexOf(q)<0)uniq.push(q);});
+  var unsupported=(texts.match(/实测|认证|便宜一半|用料扎实|耐用|保温|食品级/g)||[]).filter(function(t){return brief.indexOf(t)<0;});
+  unsupported.forEach(function(t){if(uniq.indexOf(t)<0)uniq.push(t);});
+  return uniq;
+}
+
+function review(subs, p, brief, facts, plat){
+  var issues = [], total = plat.dur.reduce(function(a,b){return a+b;},0);
+  var texts = subs.join(" ");
   issues.push({ name:"钩子时长", ok: plat.dur[0] <= 3, detail:"首镜 "+plat.dur[0]+"s（要求 ≤3s）", r: plat.dur[0]+"s" });
   issues.push({ name:"钩子字数", ok: subs[0].length <= plat.hook, detail: subs[0].length+" 字（上限 "+plat.hook+" 字）", r: subs[0].length+"", fix:"sub" });
   var over = [];
@@ -108,11 +118,7 @@ function review(subs, p, brief, facts, plat){
   issues.push({ name:"CTA 位置", ok: plat.dur[3] >= 3, detail:"结尾 "+plat.dur[3]+"s 落在最后一段", r: plat.dur[3]+"s" });
   var cps = texts.length/total;
   issues.push({ name:"语速", ok: cps <= plat.cps, detail: cps.toFixed(1)+" 字/秒（要求 ≤"+plat.cps+"）", r: cps.toFixed(1) });
-  var normalized=brief.replace(/\s/g,"").toLowerCase();
-  var quantities=texts.match(/\d+(?:\.\d+)?\s*(?:小时|分钟|天|℃|度|克|kg|ml|g|次|年|L|元|%)/gi)||[];
-  quantities.forEach(function(q){if(normalized.indexOf(q.replace(/\s/g,"").toLowerCase())<0 && uniq.indexOf(q)<0)uniq.push(q);});
-  var unsupported=(texts.match(/实测|认证|便宜一半|用料扎实|耐用|保温|食品级/g)||[]).filter(function(t){return brief.indexOf(t)<0;});
-  unsupported.forEach(function(t){if(uniq.indexOf(t)<0)uniq.push(t);});
+  var uniq=unsupportedFacts(texts,brief);
   issues.push({ name:"事实一致", ok: uniq.length===0,
     detail: uniq.length ? ("发现未溯源数字、单位或宣称："+uniq.join("、")) : "数字与单位命中原文；部分宣称已扫，不等于完整语义核验",
     r: uniq.length ? "✕" : "✓", fix:"fact" });

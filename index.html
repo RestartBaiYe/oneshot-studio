@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="assets/app.css?v=motion4">
 <link rel="stylesheet" href="assets/media.css?v=motion4">
 <link rel="stylesheet" href="assets/studio.css?v=steps3">
+<link rel="stylesheet" href="assets/screening.css?v=screen1">
 </head>
 <body>
 <div id="app">
@@ -216,7 +217,7 @@
   <div class="modal">
     <h3 id="apTitle">核对脚本与交付权限</h3>
     <p id="apBody">这个工具会写入/交付外部产物，Agent 停下来等你批准。</p>
-    <pre id="apArgs">{}</pre>
+    <div class="approval-scroll"><section id="approvalReceipt" aria-label="本次审查依据"></section><pre id="apArgs">{}</pre></div>
     <div class="acts"><button class="btn ghost" id="apNo">拒绝</button><button class="btn copper" id="apYes">允许并继续</button></div>
   </div>
 </div>
@@ -236,15 +237,15 @@
   <button id="btnSrt"></button><button id="btnSht"></button><button id="btnMemClear"></button>
 </div>
 
-<script src="core/engine.js?v=motion4"></script>
+<script src="core/engine.js?v=screen1"></script>
 <script src="core/llm.js?v=motion4"></script>
 <script src="core/tools.js?v=motion4"></script>
-<script src="core/agent.js?v=motion4"></script>
-<script src="ui/shell.js?v=steps3"></script>
+<script src="core/agent.js?v=screen1"></script>
+<script src="ui/shell.js?v=screen1"></script>
 <script src="ui/studio.js?v=steps3"></script>
 <script src="ui/media.js?v=steps3"></script>
 <script src="samples/catalog.js?v=motion4"></script>
-<script src="ui/gallery.js?v=steps3"></script>
+<script src="ui/gallery.js?v=screen1"></script>
 <script src="ui/motion.js?v=motion4"></script>
 </body>
 </html>

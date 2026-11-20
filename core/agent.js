@@ -97,7 +97,7 @@
   };
   root.Tools.all.push({id:"script.revise",title:"根据审片意见修订",scope:"write",schema:"{ lines?: object, fails?: array }",run:function(a,ctx){
     var lines=a.fails?Object.assign({},ctx.lines):a.lines;
-    if(a.fails){["hook","claim","proof","cta"].forEach(function(k){var s=String(lines[k]||"");root.BANNED.forEach(function(b){s=s.replace(new RegExp(b[1].source,"g"),"");});if((a.fails||[]).indexOf("事实一致")>=0)s=k==="cta"?(root.parseBrief(ctx.brief).price+"元，查看详情"):root.parseBrief(ctx.brief).claims[k==="proof"?1:0]||root.parseBrief(ctx.brief).name;lines[k]=s||"查看商品详情";});}
+    if(a.fails){var fallback=root.makeScript(root.parseBrief(ctx.brief),root.PLAT[ctx.platform]);["hook","claim","proof","cta"].forEach(function(k){var s=String(lines[k]||"");root.BANNED.forEach(function(b){s=s.replace(new RegExp(b[1].source,"g"),"");});if(a.fails.includes("事实一致")&&root.unsupportedFacts(s,ctx.brief).length)s=fallback[k];lines[k]=s||"查看商品详情";});}
     root.Tools.validateLines(lines);return {lines:lines,revised:true};
   }});
   root.Agent=A;

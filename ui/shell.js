@@ -141,8 +141,18 @@
   }
 
   /* ---------- 审批门 ---------- */
+  function approvalReceipt(){
+    var box=$("#approvalReceipt"), steps=Agent.state.steps, rounds=steps.filter(s=>s.tool==='review.judge'&&s.obs).map(s=>s.obs), current=rounds.at(-1);
+    box.replaceChildren();if(!current)return;
+    function add(parent,tag,cls,value){var el=document.createElement(tag);el.className=cls;el.textContent=value;parent.appendChild(el);return el;}
+    add(box,'p','receipt-meta',(LLM.active==='offline'?'离线规则 · 无模型调用':'模型辅助文案 · 本地规则复核')+' ／ 第 '+rounds.length+' 轮 ／ '+current.checks.filter(c=>c.ok).length+' 项规则通过');
+    var previous=rounds.slice(0,-1).reverse().find(r=>!r.pass);
+    if(previous){add(box,'h4','','上次为什么退回？');previous.checks.filter(c=>!c.ok).forEach(c=>add(box,'p','receipt-issue',c.name+'：'+c.detail));current.subs.forEach((line,i)=>{if(previous.subs[i]===line)return;var row=add(box,'div','receipt-diff','');add(row,'span','','镜头 0'+(i+1));add(row,'del','',previous.subs[i]);add(row,'ins','',line);});}
+    else add(box,'p','receipt-plain','首轮通过，未发生退回或改写。');
+    add(box,'h4','','对照本次商品原文');add(box,'blockquote','receipt-source',$('#brief').value);
+  }
   window.Approval = function (tool, args, resolve) {
-    $("#apTitle").textContent = "批准这四句脚本？";
+    approvalReceipt();$("#apTitle").textContent = "批准这四句脚本？";
     $("#apBody").textContent = tool.title + " 会写入/交付本地产物，Agent 已暂停等你批准（这是守卫规则，不是装饰）。";
     $("#apArgs").textContent = JSON.stringify(args, null, 2);
     if (STORY && STORY.subs) renderScript(STORY.subs);
@@ -154,7 +164,7 @@
     var done = function (v) { $("#mask").classList.remove("on"); $("#mask").removeEventListener("keydown", modalKeys); $("#apYes").onclick = null; $("#apNo").onclick = null; if(previousFocus && previousFocus.isConnected) previousFocus.focus(); resolve(v); };
     function modalKeys(e) { if(e.key === "Escape") { e.preventDefault(); e.stopPropagation(); done(false); } if(e.key === "Tab") { var buttons = Array.from(modal.querySelectorAll("button:not([disabled])")); var first = buttons[0], last = buttons[buttons.length-1]; if(e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if(!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } } }
     $("#mask").addEventListener("keydown", modalKeys);
-    $("#apNo").focus();
+    $("#mask .approval-scroll").scrollTop=0;$("#apNo").focus({preventScroll:true});
     $("#apYes").onclick = function () { done(true); };
     $("#apNo").onclick = function () { done(false); };
   };

@@ -4,15 +4,18 @@
   const gallery = q('#pane-gallery');
   let loading = false, followRun = false, navigationVersion = 0;
   const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const cards = cases.map((c, i) => `<article class="case-card"><button class="case-image" data-preview="${c.id}" aria-label="播放${escape(c.title)}预置成片"><img loading="lazy" src="${c.cover}" alt="${escape(c.title)}样片"><span>预置样片</span><b class="case-duration">12 秒</b></button><div class="case-body"><span class="case-number">0${i + 1}</span><h4>${escape(c.title)}</h4><p>${escape(c.description)}</p><div class="case-actions"><button class="btn ghost sm" data-load="${c.id}">${c.kind === 'review' ? '载入视频检查' : '载入脚本测试'}</button><button class="text-action" data-preview="${c.id}">观看样片</button></div></div></article>`).join('');
-  gallery.innerHTML = `<section class="home-hero"><div class="home-copy"><span class="eyebrow">ONESHOT STUDIO · 电商短视频工作台</span><h2>把商品信息，<br><em>变成可核对的成片方案。</em></h2><p>从真实商品事实生成四镜头脚本，检查风险，由你批准，再制作 MP4。</p><div class="home-actions"><button class="btn" id="quickScript">试用示例：生成通勤杯脚本</button><button class="btn ghost" id="newProject">用我的商品开始</button></div><p class="home-hint">示例脚本现场运行，无需安装；新 MP4 和已有视频检查需本机 FFmpeg。</p></div><button class="home-preview" data-preview="commute"><img src="samples/commute/cover.jpg" alt="通勤杯预置成片画面"><span class="preset-stamp">预置样片 · 12 秒 · 不是本次生成</span><b>先看实际成片 <i>播放 ↗</i></b></button></section><section class="use-path" aria-label="四种使用方式"><header><span class="eyebrow">从这里开始 · 按你的目标选择</span><h3>你现在要做什么？</h3><p>视频制作与已有视频检查需连接本机 FFmpeg 服务。</p></header><div class="path-grid"><button class="path-card path-demo" id="pathScript"><span>01 · SCRIPT</span><b>生成并交付脚本</b><small>商品事实 → 四句文案 → 人工批准 → 下载 TXT / SRT。</small><i>网页即可运行 · 立即试用</i></button><button class="path-card" id="pathMake"><span>02 · MP4</span><b>制作新商品视频</b><small>批准脚本并添加商品图，本机合成 MP4、字幕与分镜。</small><i>需要启动本机 FFmpeg</i></button><button class="path-card" id="pathReview"><span>03 · REVIEW</span><b>检查已有视频</b><small>检查时长、尺寸、黑场与明显画面切换。</small><i>需要启动本机 FFmpeg</i></button><button class="path-card" id="pathSamples"><span>04 · EXAMPLES</span><b>观看预置样片</b><small>播放随包视频和对应报告，不会生成新任务。</small><i>直接播放</i></button></div></section><section class="gallery-examples"><header><span class="eyebrow">可复核的演示案例</span><h3>观看样片，或载入测试任务</h3><p>咖啡案例演示退回与修订；黑场案例演示技术检测。载入不会自动审批或交付。</p></header><div class="case-grid">${cards}</div><p id="galleryStatus" class="gallery-status" role="status" aria-live="polite"></p></section><aside class="capability-note"><b>真实边界</b><p>脚本由离线规则或你配置的文本模型辅助，预检不能替代事实、法律或审美判断。FFmpeg 将商品图与字幕合成 MP4，不生成 AI 镜头或配音，也不自动发布。</p><a href="README.md">安装、启动与验证说明 →</a></aside>`;
+  const cards = cases.map((c, i) => `<article class="case-card"><button class="case-image" data-preview="${c.id}" aria-label="播放${escape(c.title)}预置成片"><img loading="eager" src="${c.cover}" alt="${escape(c.title)}样片"><span>预置样片</span><b class="case-duration">12 秒</b></button><div class="case-body"><span class="case-number">0${i + 1}</span><h4>${escape(c.title)}</h4><p>${escape(c.description)}</p><div class="case-actions"><button class="btn ghost sm" data-load="${c.id}">${c.kind === 'review' ? '载入视频检查' : '载入脚本测试'}</button><button class="text-action" data-preview="${c.id}">观看样片</button></div></div></article>`).join('');
+  gallery.innerHTML = `<section class="home-hero screening-hero" aria-labelledby="featureTitle"><div class="home-copy"><span class="screen-kicker">ONESHOT STUDIO <i></i> 新品放映室</span><p class="feature-index">本期选映 <span>01 / 03</span></p><h2 id="featureTitle">通勤杯<span>上新短片。</span></h2><p class="feature-deck">看 500 ml、316L 不锈钢和 79 元这三条商品事实，如何变成四个镜头。</p><div class="home-actions"><button class="btn watch-feature" data-preview="commute">▶ 播放预置样片 · 12 秒</button><button class="btn ghost" id="quickScript">现场生成示例脚本 →</button></div><div class="film-credit">预置 MP4 <i>／</i> 竖屏 9:16 <i>／</i> 无音轨</div></div><button class="home-preview print-frame" data-preview="commute" aria-label="播放通勤杯上新预置样片"><span class="print-grid" aria-hidden="true"></span><span class="print-count" aria-hidden="true">Nº 01</span><img src="samples/commute/preview.jpg" width="540" height="960" fetchpriority="high" alt="通勤杯样片的商品插画"><span class="print-label">OBJECT STUDY <i>01</i></span><span class="print-play" aria-hidden="true">▶</span></button></section>
+<section class="gallery-examples" aria-label="三个作品案例"><header><span class="eyebrow">SELECTED FILMS / 片单</span><h3>同一个工作台，三种现场任务。</h3><p>选一部观看。放映结束前就可以用同一份素材重跑，不会把预置成片算作本次交付。</p></header><div class="case-grid">${cards}</div><p id="galleryStatus" class="gallery-status" role="status" aria-live="polite"></p></section>
+<section class="use-path" aria-label="四种使用方式"><header><div><span class="eyebrow">WORK DESK / 自己动手</span><h3>开始自己的任务</h3></div><button class="btn" id="newProject">用我的商品新建任务 →</button></header><div class="path-grid"><button class="path-card path-demo" id="pathScript"><span>01 / 文案</span><b>试跑脚本与审批</b><small>用示例事实生成四句文案，由你决定是否导出。</small><i>浏览器即可运行 →</i></button><button class="path-card" id="pathMake"><span>02 / 制作</span><b>制作新的 MP4</b><small>用批准后的脚本和自己的商品图出片。</small><i>需要本机 FFmpeg →</i></button><button class="path-card" id="pathReview"><span>03 / 质检</span><b>检查已有视频</b><small>查时长、分辨率、黑场和画面变化，不需要脚本。</small><i>需要本机 FFmpeg →</i></button><button class="path-card" id="pathSamples"><span>04 / 放映</span><b>查看样片和报告</b><small>对照预置视频和对应的制作记录。</small><i>无需安装 →</i></button></div></section><aside class="capability-note"><b>制作边界</b><p>示例用离线规则；自建任务可配置文本模型。本机将图片与字幕合成视频；不生成实拍镜头，不做法律审核，不自动发布。</p><a href="README.md">本机启动说明 →</a></aside>`;
   const modal = document.createElement('dialog');
   modal.id = 'sampleDialog';
   modal.setAttribute('aria-labelledby','sampleTitle');
-  modal.innerHTML = '<header><div><span class="preset-label">预置样例 / NOT A LIVE RESULT</span><h2 id="sampleTitle"></h2></div><button class="btn ghost sm" id="closeSample" aria-label="关闭样例">关闭 ×</button></header><div class="sample-content"><video id="sampleVideo" controls playsinline preload="metadata"></video><div class="sample-notes"><h3>一支短片，及其制作依据。</h3><p>这是随项目附带的预置成片，不会写入本次审批、工具记录或交付包。</p><div id="sampleReport" aria-live="polite"></div><div class="sample-downloads"><a id="sampleDownload" download>下载预置 MP4 ↗</a><a id="sampleReportDownload" download>下载预置报告 JSON ↗</a></div><button class="btn" id="loadFromSample">以此案例开始新任务 →</button><p class="hint">商品为自行绘制的演示图。镜头运动与转场由本机合成；无音轨、无生成式视频。</p></div></div>';
+  modal.innerHTML = '<header><div><span class="preset-label">预置样例 / NOT A LIVE RESULT</span><h2 id="sampleTitle"></h2></div><button class="btn ghost sm" id="closeSample" aria-label="关闭样例">关闭 ×</button></header><div class="sample-content"><video id="sampleVideo" controls playsinline preload="metadata"></video><div class="sample-notes"><h3>这部样片是怎么做的？</h3><p>这是随项目附带的预置成片，不会写入本次审批、工具记录或交付包。</p><div id="sampleReport" aria-live="polite"></div><div class="sample-downloads"><a id="sampleDownload" download>下载预置 MP4 ↗</a><a id="sampleReportDownload" download>下载预置报告 JSON ↗</a></div><button class="btn" id="loadFromSample">以此案例开始新任务 →</button><p class="hint">商品为自行绘制的演示图。镜头运动与转场由本机合成；无音轨、无生成式视频。</p></div></div>';
   document.body.appendChild(modal);
-  function closeSample() { q('#sampleVideo').pause(); modal.close(); q('#sampleVideo').removeAttribute('src'); q('#sampleVideo').load(); }
+  function closeSample() { previewIntent++;q('#sampleVideo').pause(); modal.close(); q('#sampleVideo').removeAttribute('src'); q('#sampleVideo').load(); }
   q('#closeSample').onclick = closeSample;
+  modal.addEventListener('close',()=>{q('#sampleVideo').pause();});
   modal.addEventListener('cancel', e => { e.preventDefault(); closeSample(); });
   modal.addEventListener('keydown', e => {
     if(e.key!=='Tab')return;
@@ -21,10 +24,10 @@
     if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
     else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
   });
-  let previewId = '';
+  let previewId = '',previewIntent=0;
   async function preview(id) {
     const c = cases.find(c => c.id === id); if (!c) return;
-    previewId = id; q('#sampleTitle').textContent = c.title; q('#sampleVideo').src = c.video;
+    previewIntent++;previewId=id;q('#loadFromSample').textContent=c.kind==='review'?'载入此视频，在本机复检 →':'用这份素材重新生成脚本 →';q('.sample-notes h3').textContent=c.id==='coffee'?'一个没有依据的卖点，怎样退回？':c.kind==='review'?'黑场出现在哪一秒？':'从商品事实到四镜头短片'; q('#sampleTitle').textContent = c.title; q('#sampleVideo').src = c.video;
     q('#sampleDownload').href = c.video; q('#sampleReportDownload').href = c.report;
     q('#sampleReport').textContent = '读取随包附带的实测报告…';
     if (!modal.open) modal.showModal();
@@ -45,13 +48,14 @@
   async function asFile(url,name,type) { const response=await fetch(url,{signal:AbortSignal.timeout(15000)});if(!response.ok)throw Error('样例文件不可用 (HTTP '+response.status+')');return new File([await response.blob()],name,{type}); }
   function setFile(selector,file) { const dt=new DataTransfer();if(file)dt.items.add(file);q(selector).files=dt.files;q(selector).dispatchEvent(new Event('change',{bubbles:true})); }
   function updateMode() { q('#taskMode').textContent=LLM.active==='offline'?'离线规则 · 无模型调用':'模型辅助 · '+LLM.cfg.model; }
-  async function load(id,quick=false) {
+  async function load(id,quick=false,fromScreen=false) {
     if (loading || Workbench.busy()) { notice('当前任务仍在运行，请先停止或完成审批。'); return; }
     const c=cases.find(c=>c.id===id);if(!c)return;
-    const trigger=modal.open?q('#loadFromSample'):quick?q('#quickScript'):gallery.querySelector('[data-load="'+id+'"]');const label=trigger.textContent;trigger.disabled=true;trigger.textContent=quick?'正在生成脚本…':'正在载入素材…';
+    const intent=previewIntent;const trigger=modal.open?q('#loadFromSample'):quick?q('#quickScript'):gallery.querySelector('[data-load="'+id+'"]');const label=trigger.textContent;trigger.disabled=true;trigger.textContent=quick?'正在生成脚本…':'正在载入素材…';
     loading=true;gallery.setAttribute('aria-busy','true');gallery.classList.add('is-loading');notice('正在准备 '+c.title+'。如果网络加载失败，可直接使用首页示例生成脚本。');
     try {
       const f=quick?null:c.kind==='review'?await asFile(c.video,c.id+'-preset.mp4','video/mp4'):await asFile(c.image,c.id+'-product.png','image/png');
+      if(fromScreen&&(!modal.open||previewId!==id||intent!==previewIntent))return;
       q('#btnClear').click();q('#toast').classList.remove('on');setFile('#productImages',null);setFile('#reviewVideo',null);
       LLM.active='offline';q('#railProviderTxt').textContent='离线规则 · 无模型调用';updateMode();
       q('#projectTitle').textContent=c.title;q('#brief').value=c.brief || '';q('#bait').checked=!!c.repair;q('#platform').value=c.platform || 'douyin';q('#videoDuration').value='12';
@@ -60,11 +64,12 @@
       else if(c.kind==='review'){setFile('#reviewVideo',f);openVideoCheck();notice('已载入带黑场的测试视频。本次检查尚未运行；连接本机服务后点击“开始技术审查”。');}
       else {setFile('#productImages',f);Workbench.go('desk');notice(c.repair?'已载入咖啡案例，并启用一次未提供主张的故障注入。点击“生成并检查脚本”，观察真实退回与修订。':'素材已就位。核对商品事实，点击“生成并检查脚本”；预置成片没有进入本次交付包。');}
       if(modal.open)closeSample();
-    } catch(e){const msg='载入失败：'+(e.name==='TimeoutError'?'素材下载超时':e.message)+'。可重试，或用首页示例直接生成脚本。';notice(msg);if(modal.open)q('#sampleReport').textContent=msg;else trigger.after(q('#galleryStatus'));}
+      if(fromScreen&&c.kind!=='review'){Workbench.go('script');notice('使用同一份案例素材现场生成。离线规则模式，不调用模型；请核对后决定。');q('#btnStart2').click();}
+    } catch(e){if(fromScreen&&(!modal.open||previewId!==id||intent!==previewIntent))return;const msg='载入失败：'+(e.name==='TimeoutError'?'素材下载超时':e.message)+'。可重试，或用首页示例直接生成脚本。';notice(msg);if(modal.open)q('#sampleReport').textContent=msg;else trigger.after(q('#galleryStatus'));}
     finally{trigger.disabled=false;trigger.textContent=label;loading=false;gallery.removeAttribute('aria-busy');gallery.classList.remove('is-loading');}
   }
   gallery.addEventListener('click',e=>{const previewButton=e.target.closest('[data-preview]'),loadButton=e.target.closest('[data-load]');if(previewButton)preview(previewButton.dataset.preview);if(loadButton)load(loadButton.dataset.load);});
-  q('#loadFromSample').onclick=()=>load(previewId);
+  q('#loadFromSample').onclick=()=>load(previewId,false,true);
   q('#quickScript').onclick=()=>load('commute',true);
   q('#pathScript').onclick=()=>load('commute',true);
   q('#pathMake').onclick=()=>{if(Workbench.busy())return notice('先完成或停止当前任务。');const result=Agent.state.result;if(result&&result.deliveryApproved){q('#projectTitle').textContent='制作新视频';Workbench.go('media');}else{q('#newProject').click();notice('先填写商品事实并批准脚本；第 4 步才会开放新 MP4。');}};
