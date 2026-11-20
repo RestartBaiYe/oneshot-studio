@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="assets/media.css?v=motion4">
 <link rel="stylesheet" href="assets/studio.css?v=steps3">
 <link rel="stylesheet" href="assets/screening.css?v=screen1">
+<link rel="stylesheet" href="assets/slate.css?v=slate1">
 </head>
 <body>
 <div id="app">
@@ -46,7 +47,7 @@
 
     <main>
 <section class="pane on" id="pane-gallery" aria-label="案例展厅"></section>
-<div class="project-chrome" id="projectChrome"><div class="project-heading"><button class="btn ghost sm" id="backGallery">← 案例展厅</button><div><span class="eyebrow">CURRENT PROJECT / 本次任务</span><h2 id="projectTitle">新建短片</h2></div><span id="taskMode" class="mode-label">离线规则 · 无模型调用</span></div><nav class="work-steps" aria-label="四步工作台"><button data-workstep="materials" data-go="desk">01 <b>素材准备</b><small>商品事实与图片</small></button><button data-workstep="script" data-go="script">02 <b>生成脚本</b><small>四句逐镜文案</small></button><button data-workstep="review" data-go="review">03 <b>审查批准</b><small>检查依据再决定</small></button><button data-workstep="delivery" data-go="media">04 <b>视频验证与交付</b><small>制作新片或检查旧片</small></button></nav><p id="projectNotice" role="status">制作新片从商品事实开始；检查已有视频可直接进入第 4 步。</p></div>
+<div class="project-chrome" id="projectChrome"><div class="project-heading"><button class="btn ghost sm" id="backGallery">← 案例展厅</button><div><span class="eyebrow">CURRENT PROJECT / 本次任务</span><h2 id="projectTitle">新建短片</h2></div><span id="taskMode" class="mode-label">离线规则 · 无模型调用</span></div><div class="slate-rule"><span>PRODUCTION SLATE <i>/</i> 本次任务</span><small>下划线为浏览位置 · 状态来自本次运行</small></div><nav class="work-steps" aria-label="四步工作台"><button data-workstep="materials" data-go="desk">01 <b>素材准备</b><small>商品事实与图片</small></button><button data-workstep="script" data-go="script">02 <b>生成脚本</b><small>四句逐镜文案</small></button><button data-workstep="review" data-go="review">03 <b>审查批准</b><small>检查依据再决定</small></button><button data-workstep="delivery" data-go="media">04 <b>视频验证与交付</b><small>制作新片或检查旧片</small></button></nav><div class="slate-next"><div class="slate-lead"><span class="slate-cue" aria-hidden="true">↳</span><p id="projectNotice" role="status"></p></div><button class="btn" id="slateNext" type="button">填写商品事实 →</button></div></div>
       <!-- 作业台 -->
       <section class="pane" id="pane-desk">
         <div class="workspace-intro"><div><span class="eyebrow">ONESHOT STUDIO / 电商内容创作</span><h2><span>把商品信息，</span><span class="headline-finish">变成下一支短片<span class="title-dot">。</span></span></h2><p>为电商运营准备：写脚本、查风险、交付可下载的短片。</p></div><div class="intro-actions"><button class="btn ghost sm" id="goExistingVideo">检查已有视频 ↗</button><button class="btn ghost sm" id="showcase">演示视图</button></div></div>
@@ -241,11 +242,12 @@
 <script src="core/llm.js?v=motion4"></script>
 <script src="core/tools.js?v=motion4"></script>
 <script src="core/agent.js?v=screen1"></script>
-<script src="ui/shell.js?v=screen1"></script>
+<script src="ui/shell.js?v=slate1"></script>
 <script src="ui/studio.js?v=steps3"></script>
-<script src="ui/media.js?v=steps3"></script>
+<script src="ui/media.js?v=slate1"></script>
 <script src="samples/catalog.js?v=motion4"></script>
-<script src="ui/gallery.js?v=screen1"></script>
+<script src="ui/gallery.js?v=slate1"></script>
 <script src="ui/motion.js?v=motion4"></script>
+<script src="ui/slate.js?v=slate1"></script>
 </body>
 </html>

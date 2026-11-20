@@ -32,7 +32,7 @@
     $("#scriptOutput").innerHTML=lines.length ? lines.map(function(s,i){return '<div class="script-line"><span class="shot-no">0'+(i+1)+'</span><div><small>'+labels[i]+' · '+times[i]+'</small><p>'+esc(s)+'</p></div></div>';}).join("") : '<div class="script-empty"><span>等待本轮脚本</span><p>生成后在这里逐行审阅，再决定是否交付。</p></div>';
   }
   function invalidateInput(){ if(Agent.state.running || batchRunning)return; LAST=null; STORY=null; Agent.state.result=null; renderScript([]); document.querySelectorAll("#exports button, #expTxt2, #expSrt2, #expCsv2, #expMd2").forEach(function(b){b.disabled=true;}); $("#gateNote").textContent="商品或平台已修改，请重新运行并审批。"; $("#statusTxt").textContent="输入已更新"; $("#status").className="status"; phase(0,"输入已更新，运行 Agent 生成本次脚本。"); }
-  $("#brief").addEventListener("input",invalidateInput);
+  $("#brief").addEventListener("input",function(){this.setCustomValidity("");invalidateInput();});
   $("#platform").addEventListener("change",invalidateInput);
   $("#showcase").onclick=function(){var on=document.body.classList.toggle("showcase");this.textContent=on?"退出演示视图":"演示视图";};
   /* ---------- 导航 ---------- */
@@ -47,7 +47,7 @@
     $$("[data-workstep]").filter(function(el){return el.tagName === "BUTTON";}).forEach(function(b){var on=b.dataset.workstep === step;b.classList.toggle("on",on);if(on)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");});
     window.dispatchEvent(new CustomEvent("oneshot:navigate",{detail:{pane:pane,step:step}}));
   }
-  window.Workbench = {go:go,busy:function(){return Agent.state.running || batchRunning;}};
+  window.Workbench = {go:go,current:()=>LAST,busy:function(){return Agent.state.running || batchRunning;}};
   $$("#nav button[data-pane]").forEach(function (b) { b.onclick = function () { go(b.dataset.pane); }; });
   var videoStep=document.querySelector("#goVideoWorkshop"); if(videoStep) videoStep.onclick=function(){go("media");};
   $("#openReview").onclick=function(){go("review");};
@@ -172,7 +172,7 @@
   /* ---------- 运行 ---------- */
   async function run() {
     var brief = $("#brief").value.trim();
-    if (brief.length < 8) {go("desk");$("#brief").focus();$("#projectNotice").textContent="请至少填写 8 个字符，例如：通勤保温杯，500ml，售价79元。";return;}
+    if (brief.length < 8) {go("desk");$("#brief").focus();$("#brief").setCustomValidity("请至少填写 8 个字符，例如：通勤保温杯，500ml，售价79元。");$("#brief").reportValidity();return;}
     if (batchRunning || Agent.state.running) return toast("正在运行，先停止或等它结束");
     Agent.state.result=null;window.dispatchEvent(new Event('oneshot:script-start'));tlReset(); LAST = null; STORY = null; drawAt(0); renderScript([]); phase(0, "正在制定受约束计划，随后核对商品事实。");
     document.querySelectorAll("#exports button, #expTxt2, #expSrt2, #expCsv2, #expMd2").forEach(function(b){b.disabled=true;});
