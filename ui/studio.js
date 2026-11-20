@@ -28,13 +28,13 @@
   function review(obs){var prev=history.length?history[history.length-1]:null;history.push(obs);var body=q('#revisionHistory');if(history.length===1)body.replaceChildren();var detail=node('details','revision');detail.open=true;detail.appendChild(node('summary','', '第 '+history.length+' 轮 · '+(obs.pass?'规则初筛通过':'退回修订')+' · '+obs.checks.filter(function(c){return c.ok;}).length+'/'+obs.checks.length));(obs.subs||[]).forEach(function(line,i){var row=node('div','revision-row');row.appendChild(node('small','',['钩子','卖点','证据','行动引导'][i]));if(prev&&prev.subs[i]!==line)row.appendChild(node('del','',prev.subs[i]));row.appendChild(node('p','',line));detail.appendChild(row);});obs.checks.filter(function(c){return !c.ok;}).forEach(function(c){detail.appendChild(node('p','revision-issue',c.name+'：'+c.detail+' '+(c.fix||'')));});body.appendChild(detail);}
   var original=Agent.event;
   Agent.event=function(kind,p){
-    if(kind==='plan'){running=true;history=[];plan=p.steps.map(function(s){return Object.assign({},s);});current=0;renderPlan();checklist(null);q('#revisionHistory').replaceChildren(node('p','hint','等待本轮审片结果。'));announce(p.planner+'；这是一套固定流程，不是通用自主 Agent。');}
+    if(kind==='plan'){running=true;history=[];plan=p.steps.map(function(s){return Object.assign({},s);});current=0;renderPlan();checklist(null);q('#revisionHistory').replaceChildren(node('p','hint','等待本轮审片结果。'));announce(p.planner+'；Agent 将按素材、脚本、审查、交付四个阶段执行固定流程。');}
     if(kind==='step'){running=true;var id=p.step.tool;current=p.index;plan[current]=p.step;renderPlan();announce(id==='deliver.export'?'脚本已通过规则初筛。请核对四句内容后，在确认框批准本地导出。':explain(id));}
     if(kind==='observe'||kind==='tool_error'){renderPlan();}
     if(kind==='approval')announce('等待人工确认 · 请核对脚本；批准后开放本地导出。');
     if(kind==='observe'&&p.tool==='review.judge'){review(p.obs);announce(p.obs.pass?'规则初筛通过：请阅读四句脚本与检查项，决定是否批准本地导出。':'本轮未通过：Agent 将按失败项修订；未通过前不会开放交付。');}
     if(kind==='error')announce('Agent 在 '+(p.tool||'当前步骤')+' 遇到错误并停止；查看执行轨迹中的原因，修正输入或配置后重新运行。');
-    if(kind==='done'){running=false;evidence.disabled=false;checklist(p);if(p.status==='delivered'){current=plan.length;renderPlan();announce('脚本已批准。进入第 4 步交付：下载脚本文件，或连接本机制作本次新 MP4。');}else if(p.status==='aborted')announce('任务已停止；交付仍锁定。检查失败步骤后可重新运行。');else if(p.verdict&&p.verdict.pass)announce('规则初筛通过；你拒绝了本次导出，文件仍锁定。确认内容后重新运行可再次审批。');else announce(p.error||'审片未通过：查看下方失败项与执行轨迹，修正 brief 后重新运行。');q('#executionPlan').appendChild(node('p','hint',p.error||'本次结束 · '+p.status+' · '+p.steps.length+' 次工具调用'));}
+    if(kind==='done'){running=false;evidence.disabled=false;checklist(p);if(p.status==='delivered'){current=plan.length;renderPlan();announce('第 3 步完成：脚本已批准。进入第 4 步视频验证与交付，制作新 MP4 或检查已有视频。');}else if(p.status==='aborted')announce('任务已停止；交付仍锁定。检查失败步骤后可重新运行。');else if(p.verdict&&p.verdict.pass)announce('规则初筛通过；你拒绝了本次导出，文件仍锁定。确认内容后重新运行可再次审批。');else announce(p.error||'审片未通过：查看下方失败项与执行轨迹，修正 brief 后重新运行。');q('#executionPlan').appendChild(node('p','hint',p.error||'本次结束 · '+p.status+' · '+p.steps.length+' 次工具调用'));}
     window.dispatchEvent(new CustomEvent('oneshot:agent-state',{detail:{kind:kind,payload:p}}));
     return original.call(this,kind,p);
   };

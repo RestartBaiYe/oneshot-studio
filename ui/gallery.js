@@ -57,7 +57,7 @@
       q('#projectTitle').textContent=c.title;q('#brief').value=c.brief || '';q('#bait').checked=!!c.repair;q('#platform').value=c.platform || 'douyin';q('#videoDuration').value='12';
       q('#brief').dispatchEvent(new Event('input',{bubbles:true}));
       if(quick){Workbench.go('script');notice('正在用商品事实生成四句文案；不下载图片，不制作视频。');q('#btnStart2').click();}
-      else if(c.kind==='review'){setFile('#reviewVideo',f);Workbench.go('media');notice('已载入带黑场的测试视频。本次检查尚未运行；连接本机服务后点击“开始技术审查”。');}
+      else if(c.kind==='review'){setFile('#reviewVideo',f);openVideoCheck();notice('已载入带黑场的测试视频。本次检查尚未运行；连接本机服务后点击“开始技术审查”。');}
       else {setFile('#productImages',f);Workbench.go('desk');notice(c.repair?'已载入咖啡案例，并启用一次未提供主张的故障注入。点击“生成并检查脚本”，观察真实退回与修订。':'素材已就位。核对商品事实，点击“生成并检查脚本”；预置成片没有进入本次交付包。');}
       if(modal.open)closeSample();
     } catch(e){const msg='载入失败：'+(e.name==='TimeoutError'?'素材下载超时':e.message)+'。可重试，或用首页示例直接生成脚本。';notice(msg);if(modal.open)q('#sampleReport').textContent=msg;else trigger.after(q('#galleryStatus'));}
@@ -68,28 +68,31 @@
   q('#quickScript').onclick=()=>load('commute',true);
   q('#pathScript').onclick=()=>load('commute',true);
   q('#pathMake').onclick=()=>{if(Workbench.busy())return notice('先完成或停止当前任务。');const result=Agent.state.result;if(result&&result.deliveryApproved){q('#projectTitle').textContent='制作新视频';Workbench.go('media');}else{q('#newProject').click();notice('先填写商品事实并批准脚本；第 4 步才会开放新 MP4。');}};
-  q('#pathReview').onclick=()=>{if(Workbench.busy())return notice('先完成或停止当前任务。');q('#projectTitle').textContent='检查已有视频';Workbench.go('media');q('#reviewVideo').focus();};
+  function openVideoCheck(){Workbench.go('media');q('#reviewVideo').focus();q('#reviewVideo').scrollIntoView({block:'center'});}
+  q('#pathReview').onclick=()=>{if(Workbench.busy())return notice('先完成或停止当前任务。');q('#projectTitle').textContent='检查已有视频';openVideoCheck();};
   q('#pathSamples').onclick=()=>preview('commute');
   q('#newProject').onclick=()=>{if(loading||Workbench.busy())return notice('先停止或完成当前任务。');q('#btnClear').click();q('#toast').classList.remove('on');setFile('#productImages',null);setFile('#reviewVideo',null);q('#brief').value='';q('#bait').checked=false;q('#brief').dispatchEvent(new Event('input',{bubbles:true}));q('#projectTitle').textContent='新建短片';updateMode();Workbench.go('desk');q('#brief').focus();notice('从商品名称、真实参数、售价和目标人群开始。没有的信息不应编造。');};
   q('#backGallery').onclick=()=>Workbench.go('gallery');
   document.querySelectorAll('.work-steps button').forEach(b=>b.onclick=()=>Workbench.go(b.dataset.go));
   q('#btnStart2').textContent='生成并检查脚本';q('#btnStart').textContent='生成脚本';q('#openReview').textContent='查看审查与修订 →';
-  q('#goVideoWorkshop').textContent='继续到第 4 步：交付 →';
-  q('#projectChrome').after(q('#pane-desk'));
+  q('#goVideoWorkshop').textContent='进入视频验证与交付 →';
+  const prep=document.createElement('aside');prep.className='prep-guide card';prep.innerHTML='<span class="eyebrow">01 / 素材准备</span><h2>先写什么？</h2><p>列出商品名称、规格、价格，以及你能证实的卖点。没有的数据留空。</p><dl><dt>例如</dt><dd>通勤保温杯，316L 不锈钢，容量 500 ml，售价 79 元。</dd><dt>下一步会得到什么</dt><dd>四句分镜文案：开场、卖点、证据、行动引导。你批准前，不会导出或制作成片。</dd></dl>';q('.desk>.col').after(prep);q('#projectChrome').after(q('#pane-desk'));
   q('.workspace-intro').hidden=true;q('.flow').hidden=true;
   const exports=q('.delivery-card');q('.media-intro').after(exports);
   const continuation=document.createElement('div');continuation.className='stage-continuation';continuation.innerHTML='<button class="btn" id="showCurrentReview">查看规则、修订与批准状态 →</button><span>本次任务证据，非预置报告</span>';q('.run-strip').after(continuation);q('#showCurrentReview').onclick=()=>Workbench.go('review');
   const previousReview=q('#revHead').innerHTML, previousChecks=q('#revChecks').innerHTML;
   const output=document.createElement('section');output.className='card';output.hidden=true;output.innerHTML='<span class="eyebrow">本次运行 · 已通过规则初筛 · 已人工批准</span><h2>你的四镜头脚本</h2><p>下方文字是这次实际生成并批准的内容。它是脚本，不是预置样片或 MP4。</p><pre style="white-space:pre-wrap;overflow-wrap:anywhere;font:inherit" id="approvedCopy"></pre><div class="rowbtns"><button class="btn" id="getApprovedCopy">下载本次文案 TXT</button><button class="btn ghost" id="getApprovedSubs">下载字幕 SRT</button><button class="btn ghost" id="continueToMake">继续制作 MP4 →</button></div><p class="result-verify" id="resultVerify"></p>';q('#pane-review .delivery-stage').prepend(output);q('#getApprovedCopy').onclick=()=>q('#expTxt2').click();q('#getApprovedSubs').onclick=()=>q('#expSrt2').click();q('#continueToMake').onclick=()=>Workbench.go('media');
   function clearOutput(){output.hidden=true;q('#approvedCopy').textContent='';}
-  function resetReview(){if(Workbench.busy())return;clearOutput();q('#revHead').innerHTML=previousReview;q('#revChecks').innerHTML=previousChecks;q('#projectNotice').textContent='输入已更新，旧审批与文件已失效。重新生成脚本后再交付。';}
-  q('#brief').addEventListener('input',resetReview);q('#platform').addEventListener('change',resetReview);q('#btnClear').addEventListener('click',resetReview);
-  window.addEventListener('oneshot:navigate',e=>{navigationVersion++;const titles={gallery:'案例展厅',desk:'创作工作台',script:'创作工作台',review:'脚本审查',delivery:'脚本审查',media:'本次交付',settings:'模型设置',trace:'执行记录',memory:'本地记忆',batch:'批量任务'};q('.topbar h1').firstChild.textContent=titles[e.detail.pane]||'OneShot';updateMode();});
+  function resetReview(){if(Workbench.busy())return;clearOutput();q('#revFixes').textContent='生成后查看本次修订记录。';q('#revHead').innerHTML=previousReview;q('#revChecks').innerHTML=previousChecks;q('#projectNotice').textContent='输入已更新，旧审批与文件已失效。重新生成脚本后再交付。';}
+  q('#brief').addEventListener('input',resetReview);q('#platform').addEventListener('change',resetReview);q('#btnClear').addEventListener('click',resetReview);q('#chips').addEventListener('click',resetReview);
+  window.addEventListener('oneshot:navigate',e=>{navigationVersion++;const titles={gallery:'案例展厅',desk:'素材准备',script:'生成脚本',review:'审查批准',delivery:'视频验证与交付',media:'视频验证与交付',settings:'模型设置',trace:'执行记录',memory:'本地记忆',batch:'批量任务'};q('.topbar h1').firstChild.textContent=titles[e.detail.pane]||'OneShot';updateMode();if(e.detail.step){const r=Agent.state.result,has=!!q('#brief').value.trim(),ok=r?.deliveryApproved;const tips={materials:'填写商品名称和真实卖点；可选加图。准备好后生成四句脚本。',script:Workbench.busy()?'正在生成或核对脚本。':r?'已生成四句脚本。下一步查看规则检查和审批结论。':has?'商品事实已填写，可点击「生成脚本」。':'尚无商品事实。返回素材准备，填写商品后再生成脚本。',review:ok?'脚本已批准，可下载文案或继续制作视频。':r?'脚本尚未获准交付。查看原因，修改商品事实后重新运行。':'生成脚本后在这里核对文字和检查依据，再决定是否批准。',delivery:ok?'脚本已批准，可制作新 MP4；检查已有视频请单独选择文件。':'新 MP4 需要已批准脚本。检查已有视频不需要脚本，选择文件即可。'};q('#projectNotice').textContent=tips[e.detail.step];}});
+  window.addEventListener('oneshot:script-start',()=>{followRun=document.body.dataset.surface==='project';if(followRun)Workbench.go('script');clearOutput();q('#revHead').innerHTML=previousReview;q('#revChecks').replaceChildren();});
   window.addEventListener('oneshot:agent-state',e=>{const {kind,payload}=e.detail;
     if(kind==='plan'){clearOutput();followRun=document.body.dataset.surface==='project';if(!followRun)return;Workbench.go('script');notice('正在现场运行：脚本生成 → 规则检查 → 有限修订 → 人工批准。');}
-    if(kind==='approval')q('#projectNotice').textContent='等待你核对文案。批准后才能导出或制作本次成片。';
+    if(kind==='approval'&&followRun){Workbench.go('review');q('#projectNotice').textContent='等待你核对文案。批准后才能导出或制作本次成片。';}
     if(kind==='done'&&followRun){const scheduledAt=navigationVersion;requestAnimationFrame(()=>{if(navigationVersion!==scheduledAt)return;updateMode();Workbench.go('review');if(payload.deliveryApproved&&payload.files){q('#approvedCopy').textContent=payload.files.txt;q('#resultVerify').textContent=payload.verdict.checks.filter(x=>x.ok).length+' / '+payload.verdict.checks.length+' 条规则通过 · 第 '+payload.round+' 轮 · '+payload.steps.length+' 次工具调用 · '+payload.ms+' ms；已批准后才开放下载。继续前请核对商品事实与文案。';output.hidden=false;output.scrollIntoView({block:'start'});}notice(payload.deliveryApproved?'本次脚本已批准。第 4 步可下载文件，或在本机制作新 MP4。':payload.status==='aborted'?'任务已停止，文件未开放；可以修改输入后重新运行。':payload.verdict?.pass?'本次初筛通过，但你未批准交付；文件保持锁定。':payload.error||'本次规则检查未通过，查看失败项后修改输入或配置。');});}
   });
+  window.addEventListener('oneshot:media-invalidated',()=>{if(document.body.dataset.workstep==='delivery')q('#projectNotice').textContent=Agent.state.result?.deliveryApproved?'当前素材需要重新制作 MP4；脚本批准仍有效。':'制作新 MP4 需要批准脚本；已有视频可直接检查。';});
   window.addEventListener('oneshot:media-ready',()=>notice('本次新 MP4 已编码完成。播放器和下载文件来自这次实际运行。'));
   window.addEventListener('pagehide',()=>q('#sampleVideo').pause());
   Workbench.go('gallery');

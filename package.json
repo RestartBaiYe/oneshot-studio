@@ -14,6 +14,8 @@
     "samples:build": "node scripts/build-samples.cjs",
     "package": "python scripts/package.py",
     "test:motion": "node tests/motion.cjs",
+    "test:workbench": "node tests/workbench.cjs",
+    "test:first-result": "node tests/first-result.cjs",
     "test:render": "node tests/render.cjs"
   },
   "devDependencies": {

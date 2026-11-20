@@ -37,8 +37,8 @@
   $("#showcase").onclick=function(){var on=document.body.classList.toggle("showcase");this.textContent=on?"退出演示视图":"演示视图";};
   /* ---------- 导航 ---------- */
   function go(pane) {
-    var step = pane === "desk" ? "materials" : pane === "script" ? "script" : pane === "delivery" || pane === "review" ? "review" : pane === "media" ? "delivery" : "";
-    var target = pane === "delivery" ? "review" : pane === "script" ? "desk" : pane;
+    var step = pane === "desk" ? "materials" : pane === "script" ? "script" : pane === "review" ? "review" : pane === "media" || pane === "delivery" ? "delivery" : "";
+    var target = pane === "delivery" ? "media" : pane === "script" ? "desk" : pane;
     var selected = pane === "gallery" ? "gallery" : step ? "desk" : pane;
     document.body.dataset.workstep = step;
     document.body.dataset.surface = pane === "gallery" ? "gallery" : step ? "project" : "utility";
@@ -50,9 +50,9 @@
   window.Workbench = {go:go,busy:function(){return Agent.state.running || batchRunning;}};
   $$("#nav button[data-pane]").forEach(function (b) { b.onclick = function () { go(b.dataset.pane); }; });
   var videoStep=document.querySelector("#goVideoWorkshop"); if(videoStep) videoStep.onclick=function(){go("media");};
-  $("#openReview").onclick=function(){go("delivery");};
+  $("#openReview").onclick=function(){go("review");};
   $("#goExistingVideo").onclick=function(){go("media");};
-  $("#backToReview").onclick=function(){go("delivery");};
+  $("#backToReview").onclick=function(){go("review");};
 
   /* ---------- 注册表 / 契约 / 预算 ---------- */
   function renderRegistry() {
@@ -89,7 +89,7 @@
   function short(x, n) { var s = JSON.stringify(x); if (!s) return ""; return s.length > (n || 160) ? s.slice(0, n || 160) + "…" : s; }
 
   function onEvent(kind, p) {
-    if (kind === "approval") { phase(3, "审片初筛通过，等待你批准本次交付。"); }
+    if (kind === "approval") { phase(2, "审片初筛通过，等待你批准本次交付。"); }
     if (kind === "step") { var id=p.step.tool; if(id === "script.draft" || id === "script.revise") phase(1, "正在起草或修订脚本，文字将显示在结果区。"); if(id === "review.judge") phase(2, "正在核对事实、风险词和字幕长度。"); }
     if (kind === "plan") {
       $("#planSrc").textContent = p.source === "policy" ? "policy planner" : p.source;
@@ -142,7 +142,7 @@
 
   /* ---------- 审批门 ---------- */
   window.Approval = function (tool, args, resolve) {
-    $("#apTitle").textContent = "需要人工确认：" + tool.id;
+    $("#apTitle").textContent = "批准这四句脚本？";
     $("#apBody").textContent = tool.title + " 会写入/交付本地产物，Agent 已暂停等你批准（这是守卫规则，不是装饰）。";
     $("#apArgs").textContent = JSON.stringify(args, null, 2);
     if (STORY && STORY.subs) renderScript(STORY.subs);
@@ -162,9 +162,9 @@
   /* ---------- 运行 ---------- */
   async function run() {
     var brief = $("#brief").value.trim();
-    if (brief.length < 8) return toast("brief 太短，Agent 没有可用的商品信息");
+    if (brief.length < 8) {go("desk");$("#brief").focus();$("#projectNotice").textContent="请至少填写 8 个字符，例如：通勤保温杯，500ml，售价79元。";return;}
     if (batchRunning || Agent.state.running) return toast("正在运行，先停止或等它结束");
-    tlReset(); LAST = null; STORY = null; drawAt(0); renderScript([]); phase(0, "正在制定受约束计划，随后核对商品事实。");
+    Agent.state.result=null;window.dispatchEvent(new Event('oneshot:script-start'));tlReset(); LAST = null; STORY = null; drawAt(0); renderScript([]); phase(0, "正在制定受约束计划，随后核对商品事实。");
     document.querySelectorAll("#exports button, #expTxt2, #expSrt2, #expCsv2, #expMd2").forEach(function(b){b.disabled=true;});
     $("#status").className = "status run"; $("#statusTxt").textContent = "运行中";
     $("#btnStart").disabled = true; $("#gateNote").textContent = "运行中，交付锁定。";
@@ -188,7 +188,7 @@
     $("#navReview").textContent = v.pass ? "✓" : "✗";
     document.querySelectorAll("#exports button, #expTxt2, #expSrt2, #expCsv2, #expMd2").forEach(function(b){b.disabled=!res.deliveryApproved;});
     bumpMeters(); renderReview(v, res); renderArts(res); renderMem(); renderTrace();
-    $("#gateNote").textContent = res.deliveryApproved ? "本次任务已批准：可以导出四个文件。" : v.pass ? "你未批准本次交付。确认内容后重新运行并审批。" : "交付闸门锁定：查看审片或错误原因，修正后重新运行。";
+    $("#gateNote").textContent = res.deliveryApproved ? "第 3 步完成：本次脚本已批准。可导出脚本文件，或进入第 4 步制作 / 检查视频。" : v.pass ? "第 3 步暂停：你未批准本次交付。重新运行后可再次核对。" : "第 3 步未完成：查看失败项和修复记录，修改后重新运行。";
   }
 
   function renderReview(v, res) {
@@ -222,7 +222,7 @@
     $("#artMeta").innerHTML = "<span>平台 <b>" + esc($("#platform").value) + "</b></span><span>时长 <b>15.0 s</b></span><span>尺寸 <b>1080×1920</b></span><span>字幕 <b>" + subs.length + "</b> 行</span>";
     renderScript(subs);
     if(res.error) { phase(0, "任务停止：" + res.error + " 请到运行设置检查连接，修正后重新运行。"); return; }
-    phase(res.deliveryApproved ? 3 : 2, res.deliveryApproved ? "已批准交付：可下载文案、字幕、分镜和审片报告。" : "任务已结束，查看审片结论；修改商品信息后可以重新运行。");
+    phase(res.deliveryApproved ? 3 : 2, res.deliveryApproved ? "第 3 步完成。进入第 4 步，制作新视频或检查已有视频。" : "第 3 步未完成。查看审查结论，修改商品信息后重新运行。");
   }
 
   function renderMem() {
