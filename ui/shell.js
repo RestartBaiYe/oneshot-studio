@@ -36,15 +36,14 @@
   $("#platform").addEventListener("change",invalidateInput);
   $("#showcase").onclick=function(){var on=document.body.classList.toggle("showcase");this.textContent=on?"退出演示视图":"演示视图";};
   /* ---------- 导航 ---------- */
-  let aiEntry='current';
-  function go(pane,entry) {
+  function go(pane) {
     if(pane==='current'){window.StudioAI?.openCurrent();return;}
-    if(entry==='current'||entry==='ai-source')aiEntry=entry;
+
     const ai=['ai-source','ai-script','ai-check','ai-film'].indexOf(pane);
     document.body.dataset.flow=ai>=0?'ai':['desk','script','review','media','delivery','demo-settings','trace','memory','batch'].includes(pane)?'demo':'original';document.body.dataset.route=pane;
     var step = ai>=0?['materials','script','review','delivery'][ai]:pane === "desk" ? "materials" : pane === "script" ? "script" : pane === "review" ? "review" : pane === "media" || pane === "delivery" ? "delivery" : "";
     var target = ai>=0?pane:pane === "delivery" ? "media" : pane === "script" ? "desk" : pane;
-    var selected=ai>=0?aiEntry:step?'gallery':pane;
+    var selected=ai>=0?'current':step?'gallery':pane;
     document.body.dataset.workstep = step;
     document.body.dataset.surface = pane === "gallery" ? "gallery" : step ? "project" : "utility";
     $$("#nav button[data-pane]").forEach(function(b){var on=b.dataset.pane===selected;b.classList.toggle("on",on);if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
@@ -53,7 +52,7 @@
     window.dispatchEvent(new CustomEvent("oneshot:navigate",{detail:{pane:pane,step:step}}));
   }
   window.Workbench = {go:go,current:()=>LAST,busy:function(){return Agent.state.running || batchRunning;}};
-  $$("#nav button[data-pane]").forEach(function (b) { b.onclick = function () { if(b.dataset.pane==="ai-source"){window.StudioAI?.openSource();return;}go(b.dataset.pane); }; });
+  $$("#nav button[data-pane]").forEach(function (b) { b.onclick = function () { go(b.dataset.pane); }; });
   var videoStep=document.querySelector("#goVideoWorkshop"); if(videoStep) videoStep.onclick=function(){go("media");};
   $("#openReview").onclick=function(){go("review");};
   $("#goExistingVideo").onclick=function(){go("media");};
