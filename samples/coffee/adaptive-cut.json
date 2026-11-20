@@ -1,0 +1,59 @@
+{
+  "type": "本机真实帧分析，未测广告转化",
+  "sourceSeconds": 12,
+  "selected": [
+    {
+      "inFrame": 0,
+      "frames": 40,
+      "sourceFrames": 72,
+      "readFrames": 40,
+      "samples": 24,
+      "motionSeconds": 0,
+      "warnings": [
+        "未检出持续运动；按字幕和镜头职责推荐，静物不等于无价值。"
+      ],
+      "note": "首镜尽早进入可见变化，删去等待。画面变化少，以文案可读性定长。",
+      "origin": "measured"
+    },
+    {
+      "inFrame": 0,
+      "frames": 56,
+      "sourceFrames": 72,
+      "readFrames": 40,
+      "samples": 24,
+      "motionSeconds": 0,
+      "warnings": [
+        "未检出持续运动；按字幕和镜头职责推荐，静物不等于无价值。"
+      ],
+      "note": "保留能承载购买理由的完整展示片段。画面变化少，以文案可读性定长。",
+      "origin": "measured"
+    },
+    {
+      "inFrame": 0,
+      "frames": 65,
+      "sourceFrames": 72,
+      "readFrames": 17,
+      "samples": 24,
+      "motionSeconds": 0,
+      "warnings": [
+        "未检出持续运动；按字幕和镜头职责推荐，静物不等于无价值。"
+      ],
+      "note": "为卖点佐证与数字留出识别时间。画面变化少，以文案可读性定长。",
+      "origin": "measured"
+    },
+    {
+      "inFrame": 0,
+      "frames": 46,
+      "sourceFrames": 72,
+      "readFrames": 34,
+      "samples": 24,
+      "motionSeconds": 0,
+      "warnings": [
+        "未检出持续运动；按字幕和镜头职责推荐，静物不等于无价值。"
+      ],
+      "note": "给行动文案留出停留时间，不拖长尾段。画面变化少，以文案可读性定长。",
+      "origin": "measured"
+    }
+  ],
+  "duration": 8.625
+}

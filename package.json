@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node media-service/server.cjs",
-    "test": "node tests/runtime.cjs && node tests/budget.cjs && node tests/model-settings.cjs && node tests/ark.cjs && node tests/shot-retry.cjs && node tests/vision-http.cjs && node tests/project-assistant.cjs && node tests/cut-plan.cjs",
+    "test": "node tests/runtime.cjs && node tests/budget.cjs && node tests/model-settings.cjs && node tests/ark.cjs && node tests/shot-retry.cjs && node tests/vision-http.cjs && node tests/project-assistant.cjs && node tests/cut-plan.cjs && node tests/adaptive-cut.cjs",
     "test:ui": "node tests/integrated.cjs",
     "test:integrated": "node tests/integrated.cjs",
     "test:showcase": "node tests/showcase.cjs",
@@ -16,7 +16,8 @@
     "package": "python scripts/package.py",
     "test:shots": "node tests/shot-retry.cjs && node tests/integrated.cjs",
     "test:assistant": "node tests/project-assistant.cjs",
-    "test:cut": "node tests/cut-plan.cjs"
+    "test:cut": "node tests/cut-plan.cjs",
+    "test:adaptive": "node tests/adaptive-cut.cjs"
   },
   "devDependencies": {
     "playwright-core": "1.65.1"
